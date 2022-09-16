@@ -42,12 +42,15 @@ const genFiles = (options: {
   let pkgJsonFetch = [
     cliName,
     runtimePackageName,
-    mockPackageName,
     requestPackageName,
+    mockPackageName,
     reactVersion,
     ...tools,
   ];
 
+  if (hasStylelint && !hasPostCSS) {
+    pkgJsonFetch.push(postCssPackageName);
+  }
   // 读取模版资源
   fetchTemplate(`template-${type}`, () => {
     if (isLibrary) {
@@ -157,36 +160,12 @@ const genFiles = (options: {
       pkgJson.devDependencies['@testing-library/react-hooks'] = '^7.0.2';
     }
 
-    getLastVersion(runtimePackageName, function (version) {
-      pkgJsonFetch.splice(runtimePackageName as unknown as number, 1);
-      pkgJson.devDependencies[runtimePackageName] = '^' + version;
-      return version;
-    });
-    getLastVersion(reactVersion, function (version) {
-      pkgJsonFetch.splice(reactVersion as unknown as number, 1);
-      pkgJson.dependencies.react = '^' + version;
-      pkgJson.dependencies['react-dom'] = '^' + version;
-      return version;
-    });
-    tools.forEach((toolName: string) => {
+    pkgJsonFetch.forEach((toolName: string) => {
       getLastVersion(toolName, function (version) {
-        pkgJsonFetch.splice(toolName as unknown as number, 1);
+        pkgJsonFetch.splice(pkgJsonFetch.indexOf(toolName), 1);
         pkgJson.devDependencies[toolName] = '^' + version;
         return version;
       });
-    });
-    if (hasStylelint && !hasPostCSS) {
-      pkgJsonFetch.push(postCssPackageName);
-      getLastVersion(postCssPackageName, function (version) {
-        pkgJsonFetch.splice(postCssPackageName as unknown as number, 1);
-        pkgJson.devDependencies[postCssPackageName] = '^' + version;
-        return version;
-      });
-    }
-    getLastVersion(cliName, function (version) {
-      pkgJsonFetch.splice(cliName, 1);
-      pkgJson.devDependencies[cliName] = '^' + version;
-      return version;
     });
 
     Object.keys(ignoreConfig).forEach((ignore) => {
@@ -299,7 +278,7 @@ const handleCreate = (
             value: 'husky',
           },
         ],
-        default: [postCssPackageName, eslintPackageName],
+        default: [postCssPackageName, stylelintPackageName, eslintPackageName],
       },
     ])
     .then((answers) => {
