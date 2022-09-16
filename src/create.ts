@@ -39,7 +39,14 @@ const genFiles = (options: {
     hasHusky = tools.includes('husky'),
     packagePath = destination + '/package.json',
     ignoreConfig = JSON.parse(readFileSync(path.join(__dirname, '../conf/ignore.json')));
-  let pkgJsonFetch = [cliName, runtimePackageName, mockPackageName, requestPackageName, reactVersion, ...tools];
+  let pkgJsonFetch = [
+    cliName,
+    runtimePackageName,
+    mockPackageName,
+    requestPackageName,
+    reactVersion,
+    ...tools,
+  ];
 
   // 读取模版资源
   fetchTemplate(`template-${type}`, () => {
@@ -52,19 +59,19 @@ const genFiles = (options: {
       });
       tscJson.compilerOptions.paths = tscpaths;
       global.templates['package/tsconfig.json'] = JSON.stringify(tscJson, null, 4);
-
     }
     for (const key in global.templates) {
       if (Object.hasOwnProperty.call(global.templates, key)) {
         const filename = key.replace('package/', '');
 
-        global.templates[key] = global.templates[key].replace(/PackageNameByCli/g, cliName);
-        global.templates[key] = global.templates[key].replace(/PackageNameByCore/g, runtimePackageName);
-        global.templates[key] = global.templates[key].replace(/PackageNameByMock/g, mockPackageName);
-        global.templates[key] = global.templates[key].replace(/PackageNameByRequest/g, requestPackageName);
-        global.templates[key] = global.templates[key].replace(/PackageNameByStylelint/g, stylelintPackageName);
-        global.templates[key] = global.templates[key].replace(/PackageNameByEslint/g, eslintPackageName);
-        global.templates[key] = global.templates[key].replace(/PackageNameByPostCss/g, postCssPackageName);
+        global.templates[key] = global.templates[key]
+          .replace(/PackageNameByCli/g, cliName)
+          .replace(/PackageNameByCore/g, runtimePackageName)
+          .replace(/PackageNameByMock/g, mockPackageName)
+          .replace(/PackageNameByRequest/g, requestPackageName)
+          .replace(/PackageNameByStylelint/g, stylelintPackageName)
+          .replace(/PackageNameByEslint/g, eslintPackageName)
+          .replace(/PackageNameByPostCss/g, postCssPackageName);
         if (isLibrary) {
           global.templates[key] = global.templates[key].replace(/libraryNameTemplate/g, name);
         }
@@ -131,11 +138,13 @@ const genFiles = (options: {
     }
 
     if (hasStylelint) {
-      pkgJson.scripts['stylelint'] = lintDir.map(dir => `${cliAlias} stylelint ${dir}`).join(' && ');
+      pkgJson.scripts['stylelint'] = lintDir
+        .map((dir) => `${cliAlias} stylelint ${dir}`)
+        .join(' && ');
       lints.push(pkgJson.scripts['stylelint']);
     }
     if (hasEslint) {
-      pkgJson.scripts['eslint'] = lintDir.map(dir => `${cliAlias} eslint ${dir}`).join(' && ');
+      pkgJson.scripts['eslint'] = lintDir.map((dir) => `${cliAlias} eslint ${dir}`).join(' && ');
       lints.push(pkgJson.scripts['eslint']);
     }
     if (hasHusky) {
