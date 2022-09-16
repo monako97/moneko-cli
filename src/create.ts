@@ -21,10 +21,9 @@ const genFiles = (options: {
   type: string;
   author: string;
   tools: string[];
-  reactVersion: string;
   destination?: string;
 }) => {
-  const { name, type, tools, reactVersion } = options;
+  const { name, type, tools } = options;
   const isLibrary = type === 'library';
   const _destination = options.destination;
   // 项目指定生成目录，如果命令中没有有配置目录，则在当前命令运行的目录下生成以项目名称为名字的新目录
@@ -39,12 +38,14 @@ const genFiles = (options: {
     hasHusky = tools.includes('husky'),
     packagePath = destination + '/package.json',
     ignoreConfig = JSON.parse(readFileSync(path.join(__dirname, '../conf/ignore.json')));
+  const dependencies = ['react', 'react-dom'];
   let pkgJsonFetch = [
     cliName,
     runtimePackageName,
     requestPackageName,
     mockPackageName,
-    reactVersion,
+    'react',
+    'react-dom',
     ...tools,
   ];
 
@@ -154,16 +155,14 @@ const genFiles = (options: {
       pkgJson.scripts.prepare = cliAlias + ' githooks pre-commit "npm run precommit"';
       pkgJson.scripts.precommit = lints.join(' && ');
     }
-    // react 17 jest
-    if (isLibrary && reactVersion.includes('react@17.0.2')) {
-      pkgJson.devDependencies['@testing-library/react'] = '^12.1.5';
-      pkgJson.devDependencies['@testing-library/react-hooks'] = '^7.0.2';
-    }
-
     pkgJsonFetch.forEach((toolName: string) => {
       getLastVersion(toolName, function (version) {
         pkgJsonFetch.splice(pkgJsonFetch.indexOf(toolName), 1);
-        pkgJson.devDependencies[toolName] = '^' + version;
+        if (dependencies.includes(toolName)) {
+          pkgJson.dependencies[toolName] = '^' + version;
+        } else {
+          pkgJson.devDependencies[toolName] = '^' + version;
+        }
         return version;
       });
     });
@@ -232,23 +231,6 @@ const handleCreate = (
             key: 'type',
             name: '组件库(npm package)',
             value: 'library',
-          },
-        ],
-      },
-      {
-        type: 'list',
-        name: 'reactVersion',
-        message: '您使用的 react 版本是?',
-        choices: [
-          {
-            key: 'reactVersion',
-            name: 'react',
-            value: 'react',
-          },
-          {
-            key: 'reactVersion',
-            name: 'react 17 (odd)',
-            value: 'react@17.0.2',
           },
         ],
       },
