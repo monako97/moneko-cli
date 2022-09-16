@@ -25,6 +25,7 @@ const genFiles = (options: {
 }) => {
   const { name, type, tools } = options;
   const isLibrary = type === 'library';
+  const templateName = `template-${isLibrary ? 'component-library' : type}`;
   const _destination = options.destination;
   // 项目指定生成目录，如果命令中没有有配置目录，则在当前命令运行的目录下生成以项目名称为名字的新目录
   const destination = _destination ? path.resolve(_destination) : path.resolve(process.cwd(), name);
@@ -53,7 +54,7 @@ const genFiles = (options: {
     pkgJsonFetch.push(postCssPackageName);
   }
   // 读取模版资源
-  fetchTemplate(`template-${type}`, () => {
+  fetchTemplate(templateName, () => {
     if (isLibrary) {
       const tscJson = JSON.parse(global.templates['package/tsconfig.json']);
       const tscpaths = tscJson.compilerOptions.paths || {};
