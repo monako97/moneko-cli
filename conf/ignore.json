@@ -29,7 +29,7 @@
   ],
   ".eslintrc.yaml": [
     "extends:",
-    "  - moneko",
+    "  - neko",
     "ignorePatterns:",
     "  - dist/",
     "  - coverage/",
