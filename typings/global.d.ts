@@ -6,7 +6,6 @@ declare global {
         port: number;
       };
     };
-    log: (msg: any) => void;
   }
 }
 

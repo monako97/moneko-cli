@@ -18,7 +18,7 @@ export const fetchTemplate = (pkgName: string, onFinish?: () => void) => {
     },
     function (_code, stdout, stderr) {
       if (stderr) {
-        console.log(stderr);
+        console.error(stderr);
         return;
       }
       const version = stdout.replace(/\n/g, '');

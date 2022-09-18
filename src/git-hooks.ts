@@ -8,6 +8,5 @@ program
     .action((file, cmd) => {
         const shellSrc = `git init && husky install node_modules/.husky && husky set node_modules/.husky/${file} \"${cmd}\"`;
 
-        console.log(shellSrc)
         runLint(shellSrc, 'githooks', [null]);
     });

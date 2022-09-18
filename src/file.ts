@@ -13,7 +13,7 @@ export const writeFile = (filePath: string, value: Buffer | string) => {
   }
   fs.writeFile(filePath, value, 'utf-8', (err) => {
     // eslint-disable-next-line no-console
-    if (err) console.log(err);
+    if (err) console.error(err);
   });
 };
 

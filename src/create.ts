@@ -60,7 +60,7 @@ const genFiles = (options: {
       const tscpaths = tscJson.compilerOptions.paths || {};
 
       Object.assign(tscpaths, {
-        [name + '/*']: ['src/*'],
+        [name + '/*']: ['components/*'],
       });
       tscJson.compilerOptions.paths = tscpaths;
       global.templates['package/tsconfig.json'] = JSON.stringify(tscJson, null, 4);
@@ -137,9 +137,9 @@ const genFiles = (options: {
     pkgJson.version = '1.0.0';
     pkgJson.files = isLibrary ? ['lib', 'es', 'README.md', 'LICENSE'] : undefined;
     const lints = [];
-    const lintDir = ['src'];
+    let lintDir = ['src'];
     if (isLibrary) {
-      lintDir.push('site');
+      lintDir = ['site', 'components'];
     }
 
     if (hasStylelint) {
