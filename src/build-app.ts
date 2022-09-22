@@ -159,7 +159,7 @@ const createApp = async () => {
         // 修改 安卓build.gradle
         const androidBuildGradlePath = path.join(outputPath, 'android/app/build.gradle');
         let androidBuildGradle = readFileSync(androidBuildGradlePath);
-        let minSdkVersion = 'minSdkVersion flutter.minSdkVersion';
+        const minSdkVersion = 'minSdkVersion flutter.minSdkVersion';
 
         if (androidBuildGradle.includes(minSdkVersion)) {
           androidBuildGradle = androidBuildGradle.replace(minSdkVersion, 'minSdkVersion 20');
@@ -168,6 +168,10 @@ const createApp = async () => {
           const len = androidBuildGradle.substring(minSdkVersionIndex,  minSdkVersionIndex + 16);
   
           androidBuildGradle = androidBuildGradle.replace(len, 'minSdkVersion 20');
+        }
+        const compileSdkVersion = 'compileSdkVersion flutter.compileSdkVersion';
+        if (androidBuildGradle.includes(compileSdkVersion)) {
+            androidBuildGradle = androidBuildGradle.replace(compileSdkVersion, 'compileSdkVersion 32');
         }
         
         writeFile(androidBuildGradlePath, androidBuildGradle);
