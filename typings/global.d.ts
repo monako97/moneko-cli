@@ -5,6 +5,7 @@ declare global {
       devServer: {
         port: number;
       };
+      modifyVars: Record<string, string>;
     };
   }
 }
