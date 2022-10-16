@@ -69,7 +69,7 @@ program
         shell.exec(`rm -rf ${dir}`, { silent: true });
         // 编译 package
         const buildPkg = spawnSync(
-          `${nodePath}npx swc components -d ${buildLib[i].dir} -C module.type=${buildLib[i].type} -C minify=true -C jsc.parser.tsx=true -C jsc.parser.syntax=typescript -s --copy-files`,
+          `${nodePath}npx swc components -d ${buildLib[i].dir} -C module.type=${buildLib[i].type} -C minify=true -C jsc.parser.tsx=true -C jsc.parser.syntax=typescript --copy-files`,
           {
             stdio: 'inherit',
             shell: true,
