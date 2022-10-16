@@ -1,36 +1,31 @@
 import { extname, join, resolve } from 'path';
-import { unlink, readFile, writeFile, readdirSync, statSync } from 'fs';
-import chalk from 'chalk';
+import { unlink, readFile, writeFile, readdirSync, statSync, existsSync } from 'fs';
 import { exec } from 'child_process';
 import { nodePath, runtimePackageName } from './utils/config';
+
 let modifyVarBash = '';
 const cwd = process.cwd();
-
-// function log(name: string, success: boolean, filePath: string) {
-//   if (success) {
-//     process.stdout.write(chalk.cyan(name) + ': ' + filePath + chalk.green(' Success') + '\n');
-//   } else {
-//     process.stdout.write(chalk.red(name) + ': ' + filePath + chalk.red(' Error') + '\n');
-//   }
-// }
+const postcssConf = existsSync(join(cwd, 'postcss.config.js')) ? join(cwd, 'postcss.config.js') : null;
 
 function postcss(file: string, outputPath: string) {
   return new Promise((resolve, reject) => {
-    exec(
-      `${nodePath}npx postcss -c ${join(cwd, 'postcss.config.js')} ${outputPath} -o ${outputPath}`,
-      function (error) {
-        // log('postcss', !error, outputPath);
-        if (error) return reject(error);
-        resolve(unlink(file, (err) => err));
-      }
-    );
+    if (postcssConf) {
+      exec(
+        `${nodePath}npx postcss ${outputPath} -o ${outputPath}`,
+        function (error) {
+          if (error) return reject(error);
+          resolve(unlink(file, (err) => err));
+        }
+      );
+    } else {
+      resolve(unlink(file, (err) => err));
+    }
   });
 }
 
 function lessc({ file, outputPath }: { file: string; outputPath: string }) {
   return new Promise((resolve, reject) => {
     exec(`${nodePath}npx lessc --js ${modifyVarBash} ${file} > ${outputPath}`, function (error) {
-    //   log('lessc', !error, file);
       if (error) return reject(error);
       resolve(postcss(file, outputPath));
     });
