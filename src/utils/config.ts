@@ -6,6 +6,7 @@ export const nodePath = process.platform === 'win32' ? '' : nodeDir;
 export const cliPkgJson = JSON.parse(readFileSync(path.join(__dirname, '../package.json')));
 export const runtimePackageName = `@${anthor}/core`;
 export const mockPackageName = `@${anthor}/mock`;
+export const commonPackageName = `@${anthor}/common`;
 export const requestPackageName = `@${anthor}/request`;
 export const postCssPackageName = `@${anthor}/postcss`;
 export const eslintPackageName = `eslint-config-neko`;

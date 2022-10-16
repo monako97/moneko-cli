@@ -8,6 +8,7 @@ import {
   cliAlias,
   cliName,
   runtimePackageName,
+  commonPackageName,
   stylelintPackageName,
   eslintPackageName,
   postCssPackageName,
@@ -39,11 +40,12 @@ const genFiles = (options: {
     hasHusky = tools.includes('husky'),
     packagePath = destination + '/package.json',
     ignoreConfig = JSON.parse(readFileSync(path.join(__dirname, '../conf/ignore.json')));
-  const dependencies = ['react', 'react-dom'];
+  const dependencies = ['react', 'react-dom', commonPackageName];
   let pkgJsonFetch = [
     cliName,
     runtimePackageName,
     requestPackageName,
+    commonPackageName,
     mockPackageName,
     'react',
     'react-dom',
@@ -73,6 +75,7 @@ const genFiles = (options: {
           .replace(/PackageNameByCli/g, cliName)
           .replace(/PackageNameByCore/g, runtimePackageName)
           .replace(/PackageNameByMock/g, mockPackageName)
+          .replace(/PackageNameByCommon/g, commonPackageName)
           .replace(/PackageNameByRequest/g, requestPackageName)
           .replace(/PackageNameByStylelint/g, stylelintPackageName)
           .replace(/PackageNameByEslint/g, eslintPackageName)
