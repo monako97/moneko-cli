@@ -16,7 +16,7 @@ program
     const shellSrc = `${nodePath}npx eslint ${path.relative(
       process.cwd(),
       soucre
-    )} --ext .js --ext .ts --ext .jsx --ext .tsx --ext .vue ${cmd.parent.args.slice(2).join(' ')}`;
+    )} --ext js,ts,jsx,tsx,md,mdx,vue ${cmd.parent.args.slice(2).join(' ')}`;
 
     runLint(shellSrc, 'eslint');
   });
