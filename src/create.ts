@@ -177,7 +177,7 @@ const genFiles = (options: {
 
     Object.keys(ignoreConfig).forEach((ignore) => {
       const ignoreSrc = destination + '/' + ignore,
-        ignoreVal = ignoreConfig[ignore].join('\n');
+        ignoreVal = ignoreConfig[ignore].join('\n').replace(/libraryNameTemplate/g, name);
 
       if (ignore.includes('prettier') || ignore.includes('eslint')) {
         if (hasEslint) writeFile(ignoreSrc, ignoreVal);
@@ -244,7 +244,7 @@ const handleCreate = (
             key: 'type',
             name: '组件库(npm package)',
             value: 'library',
-          }
+          },
         ],
       },
       {
