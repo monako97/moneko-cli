@@ -20,12 +20,26 @@ program
     }
     getLastVersion(cliName, null, true);
     const args = cmd[1].args;
+    const hasDocs = !args.includes('no-docs');
+    const hasLib = !args.includes('no-lib');
+    const hasEs = !args.includes('no-es');
+    const tsconfig = relative(process.cwd(), `tsconfig.json`);
+    const confPath = relative(
+      process.cwd(),
+      `./node_modules/${runtimePackageName}/build/webpack.prod`
+    );
+    const shellSrc = `${nodePath}npx cross-env NODE_ENV=production APPTYPE=${args
+      .filter((a: string) => !['no-docs', 'no-es', 'no-lib'].includes(a))
+      .join(' ')} webpack --config ${confPath}`;
 
     if (args[0] === 'library') {
       const buildLib = [
-        { type: 'commonjs', dir: 'lib' },
-        { type: 'es6', dir: 'es' },
-      ];
+        hasLib && { type: 'commonjs', dir: 'lib' },
+        hasEs && { type: 'es6 -C jsc.target=es2015', dir: 'es' },
+      ].filter(Boolean) as {
+        type: string;
+        dir: string;
+      }[];
 
       for (let i = 0, len = buildLib.length; i < len; i++) {
         const dir = join(cwd, `./${buildLib[i].dir}`);
@@ -48,16 +62,50 @@ program
           }
         });
         // 编译类型文件
-        spawn(`${nodePath}npx tsc --project ${join(cwd, `./node_modules/${cliName}/conf/pkg.json`)} --outDir ${buildLib[i].dir}`, spawnOptions);
+        spawn(
+          `${nodePath}npx tsc --project ${join(
+            cwd,
+            `./node_modules/${cliName}/conf/pkg.json`
+          )} --outDir ${buildLib[i].dir}`,
+          spawnOptions
+        );
       }
     }
-    spawn(
-      `${nodePath}npx cross-env NODE_ENV=production APPTYPE=${args.join(
-        ' '
-      )} webpack --config ${relative(
-        cwd,
-        `./node_modules/${runtimePackageName}/build/webpack.prod`
-      )}`,
-      spawnOptions
-    );
+    if (args[0] !== 'library' || (hasDocs && args[0] === 'library')) {
+      if (args[0] === 'single-component') {
+        const cjsShell = [
+          'rm -rf lib',
+          hasLib && 'swc src -d lib -C module.type=es6 -C minify=true -s --copy-files',
+          `tsc --project ${tsconfig}`,
+        ]
+          .filter(Boolean)
+          .join(' && ');
+        const cjsBuild = spawn(cjsShell, {
+          stdio: 'inherit',
+          shell: true,
+        });
+  
+        cjsBuild.on('close', function (code) {
+          if (code !== 0) {
+            process.exit(0);
+          }
+        });
+      }
+      const build = spawn(shellSrc, spawnOptions);
+  
+      build.on('close', function (code) {
+        if (code === 0 && args[0] === 'single-component') {
+          const dtsShell = [
+            'dts-bundle --name flowchart-designer --baseDir . --out umd/index.d.ts --main lib/index.d.ts',
+            !hasLib && 'rm -rf lib',
+          ]
+            .filter(Boolean)
+            .join(' && ');
+          spawn(dtsShell, {
+            stdio: 'inherit',
+            shell: true,
+          });
+        }
+      });
+    }
   });

@@ -13,7 +13,7 @@ program
   .option('--ext')
   .description('css代码规范检查')
   .action((soucre, _, cmd) => {
-    const shellSrc = `${nodePath}npx stylelint ${path.relative(process.cwd(), soucre)}/**/**/**/**/*.{less,css} ${cmd.parent.args.slice(2).join(' ')}`;
+    const shellSrc = `${nodePath}npx stylelint ${path.relative(process.cwd(), soucre)}/**/**/**/**/*.{less,css} ${cmd.parent.args.slice(2).join(' ')} --allow-empty-input`;
 
     runLint(shellSrc, 'stylelint');
   });

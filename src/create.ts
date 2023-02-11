@@ -26,6 +26,7 @@ const genFiles = (options: {
 }) => {
   const { name, type, tools } = options;
   const isLibrary = type === 'library';
+  const isSingleComponent = type === 'single-component';
   const templateName = `template-${isLibrary ? 'component-library' : type}`;
   const _destination = options.destination;
   // 项目指定生成目录，如果命令中没有有配置目录，则在当前命令运行的目录下生成以项目名称为名字的新目录
@@ -79,10 +80,8 @@ const genFiles = (options: {
           .replace(/PackageNameByRequest/g, requestPackageName)
           .replace(/PackageNameByStylelint/g, stylelintPackageName)
           .replace(/PackageNameByEslint/g, eslintPackageName)
-          .replace(/PackageNameByPostCss/g, postCssPackageName);
-        if (isLibrary) {
-          global.templates[key] = global.templates[key].replace(/libraryNameTemplate/g, name);
-        }
+          .replace(/PackageNameByPostCss/g, postCssPackageName)
+          .replace(/libraryNameTemplate/g, name);
         writeFile(path.join(destination, filename), global.templates[key]);
       }
     }
@@ -138,11 +137,16 @@ const genFiles = (options: {
     pkgJson.scripts.start = cliAlias + ' start ' + type;
     pkgJson.scripts.build = cliAlias + ' build ' + type;
     pkgJson.version = '1.0.0';
-    pkgJson.files = isLibrary ? ['lib', 'es', 'README.md', 'LICENSE'] : undefined;
+    pkgJson.files = undefined;
     const lints = [];
     let lintDir = ['src'];
     if (isLibrary) {
       lintDir = ['site', 'components'];
+      pkgJson.files = ['lib', 'es', 'README.md', 'LICENSE'];
+    }
+    if (isSingleComponent) {
+      lintDir = ['src', 'example'];
+      pkgJson.files = ['lib', 'umd', 'example', 'README.md'];
     }
 
     if (hasStylelint) {
@@ -233,9 +237,14 @@ const handleCreate = (
           },
           {
             key: 'type',
+            name: '独立组件(npm package)',
+            value: 'single-component',
+          },
+          {
+            key: 'type',
             name: '组件库(npm package)',
             value: 'library',
-          },
+          }
         ],
       },
       {

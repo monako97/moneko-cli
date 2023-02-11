@@ -30,10 +30,15 @@
   ".eslintrc.yaml": [
     "extends:",
     "  - neko",
-    "ignorePatterns:",
-    "  - dist/",
-    "  - coverage/",
-    "  - __snapshots__/"
+    "rules:",
+    "  import/no-unresolved:",
+    "    - 2",
+    "    - ignore:",
+    "      - \\?raw$",
+    "      - ^@pkg",
+    "      - ^@/",
+    "      - components",
+    "      - ^libraryNameTemplate"
   ],
   ".prettierrc.yaml": [
     "printWidth: 100",
@@ -51,9 +56,6 @@
     "extends:",
     "  - stylelint-config-moneko",
     "ignoreFiles:",
-    "  - node_modules/**/*",
-    "  - node_modules.nosync/**/*",
-    "  - coverage/**/*",
-    "  - coverage.nosync/**/*"
+    "  - coverage/**/*"
   ]
 }
