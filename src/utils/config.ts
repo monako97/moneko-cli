@@ -9,6 +9,7 @@ export const mockPackageName = `@${anthor}/mock`;
 export const commonPackageName = `@${anthor}/common`;
 export const requestPackageName = `@${anthor}/request`;
 export const postCssPackageName = `@${anthor}/postcss`;
+export const reactLivePackageName = `@${anthor}/react-live`;
 export const eslintPackageName = `eslint-config-neko`;
 export const stylelintPackageName = `stylelint-config-${anthor}`;
 export const cliName = cliPkgJson.name;

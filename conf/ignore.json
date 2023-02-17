@@ -17,15 +17,16 @@
     ".idea",
     ".vscode",
     ".DS_Store",
-    "node_modules",
-    "node_modules.nosync",
+    ".swc",
+    "/coverage",
     "/dist",
     "/docs",
-    "/lib",
-    "/coverage",
-    "__snapshots__",
     "/es",
-    "package-lock.json"
+    "/lib",
+    "__snapshots__",
+    "node_modules",
+    "package-lock.json",
+    "yarn.lock"
   ],
   ".eslintrc.yaml": [
     "extends:",

@@ -14,6 +14,7 @@ import {
   postCssPackageName,
   mockPackageName,
   requestPackageName,
+  reactLivePackageName,
 } from './utils/config.js';
 import { fetchTemplate } from './utils/template.js';
 
@@ -81,6 +82,7 @@ const genFiles = (options: {
           .replace(/PackageNameByStylelint/g, stylelintPackageName)
           .replace(/PackageNameByEslint/g, eslintPackageName)
           .replace(/PackageNameByPostCss/g, postCssPackageName)
+          .replace(/PackageNameByReactLive/g, reactLivePackageName)
           .replace(/libraryNameTemplate/g, name);
         writeFile(path.join(destination, filename), global.templates[key]);
       }
