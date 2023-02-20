@@ -73,8 +73,8 @@ String initWebView(context) {
           (function () {
             window.areaPaddingTop = $areaPaddingTop; 
             window.areaPaddingBottom = $areaPaddingBottom;
-            document.documentElement.style.setProperty('--areaPaddingTop', $areaPaddingTop + 'px');
-            document.documentElement.style.setProperty('--areaPaddingBottom', $areaPaddingBottom + 'px');
+            document.documentElement.style.setProperty('--area-padding-top', $areaPaddingTop + 'px');
+            document.documentElement.style.setProperty('--area-padding-bottom', $areaPaddingBottom + 'px');
             window.H5RemoteRuntime.bootstrap();
           })();
           ''';

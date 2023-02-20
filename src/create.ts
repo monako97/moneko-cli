@@ -169,22 +169,42 @@ const genFiles = (options: {
       getLastVersion(toolName, function (version) {
         pkgJsonFetch.splice(pkgJsonFetch.indexOf(toolName), 1);
         if (dependencies.includes(toolName)) {
-          pkgJson.dependencies[toolName] = '^' + version;
+          pkgJson.dependencies[toolName] = version;
         } else {
-          pkgJson.devDependencies[toolName] = '^' + version;
+          pkgJson.devDependencies[toolName] = version;
         }
         return version;
       });
     });
 
     Object.keys(ignoreConfig).forEach((ignore) => {
-      const ignoreSrc = destination + '/' + ignore,
-        ignoreVal = ignoreConfig[ignore].join('\n').replace(/libraryNameTemplate/g, name);
+      const ignoreSrc = destination + '/' + ignore;
+      let ignoreVal = ignoreConfig[ignore];
+
+      if (isLibrary) {
+        ignoreVal = [
+          ...ignoreVal,
+          'rules:',
+          '  import/no-unresolved:',
+          '    - 2',
+          '    - ignore:',
+          '      - \\?raw$',
+          '      - ^@pkg',
+          '      - ^@/',
+          '      - components',
+          '      - ^libraryNameTemplate',
+        ];
+      }
+      ignoreVal = ignoreVal.join('\n').replace(/libraryNameTemplate/g, name);
 
       if (ignore.includes('prettier') || ignore.includes('eslint')) {
-        if (hasEslint) writeFile(ignoreSrc, ignoreVal);
+        if (hasEslint) {
+          writeFile(ignoreSrc, ignoreVal);
+        }
       } else if (ignore.includes('stylelint')) {
-        if (hasStylelint) writeFile(ignoreSrc, ignoreVal);
+        if (hasStylelint) {
+          writeFile(ignoreSrc, ignoreVal);
+        }
       } else {
         writeFile(ignoreSrc, ignoreVal);
       }

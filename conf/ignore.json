@@ -30,16 +30,7 @@
   ],
   ".eslintrc.yaml": [
     "extends:",
-    "  - neko",
-    "rules:",
-    "  import/no-unresolved:",
-    "    - 2",
-    "    - ignore:",
-    "      - \\?raw$",
-    "      - ^@pkg",
-    "      - ^@/",
-    "      - components",
-    "      - ^libraryNameTemplate"
+    "  - neko"
   ],
   ".prettierrc.yaml": [
     "printWidth: 100",
