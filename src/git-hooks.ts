@@ -1,12 +1,18 @@
-
 import { program } from 'commander';
 import { runLint } from './runlint';
 
 program
-    .command('githooks [file] [cmd]')
-    .description('git hooks工具')
-    .action((file, cmd) => {
-        const shellSrc = `git init && husky install node_modules/.husky && husky set node_modules/.husky/${file} \"${cmd}\"`;
+  .command('githooks')
+  .description('git hooks工具')
+  .action((_, cmd) => {
+    const installPath = 'node_modules/.husky';
+    const huskySet = cmd.args
+      .map((h: string) => {
+        const argv = h.split('=');
 
-        runLint(shellSrc, 'githooks', [null]);
-    });
+        return `husky set ${installPath}/${argv[0]} "${argv[1]}"`;
+      })
+      .join(' && ');
+    const shellSrc = `git init && husky install ${installPath} && ${huskySet}`;
+    runLint(shellSrc, 'githooks', [null]);
+  });

@@ -12,6 +12,7 @@ export const postCssPackageName = `@${anthor}/postcss`;
 export const reactLivePackageName = `@${anthor}/react-live`;
 export const eslintPackageName = `eslint-config-neko`;
 export const stylelintPackageName = `stylelint-config-${anthor}`;
+export const changelogPackageName = `conventional-changelog-cli`;
 export const cliName = cliPkgJson.name;
 export const cliVersion = cliPkgJson.version;
 export const cliAlias = Object.keys(cliPkgJson.bin)[0];

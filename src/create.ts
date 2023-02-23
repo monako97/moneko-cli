@@ -15,6 +15,7 @@ import {
   mockPackageName,
   requestPackageName,
   reactLivePackageName,
+  changelogPackageName,
 } from './utils/config.js';
 import { fetchTemplate } from './utils/template.js';
 
@@ -39,6 +40,7 @@ const genFiles = (options: {
   const hasEslint = tools.includes(eslintPackageName),
     hasStylelint = tools.includes(stylelintPackageName),
     hasPostCSS = tools.includes(postCssPackageName),
+    hasChangelog = tools.includes(changelogPackageName),
     hasHusky = tools.includes('husky'),
     packagePath = destination + '/package.json',
     ignoreConfig = JSON.parse(readFileSync(path.join(__dirname, '../conf/ignore.json')));
@@ -56,6 +58,10 @@ const genFiles = (options: {
 
   if (hasStylelint && !hasPostCSS) {
     pkgJsonFetch.push(postCssPackageName);
+  }
+  if (hasHusky) {
+    pkgJsonFetch.push('@commitlint/cli');
+    pkgJsonFetch.push('@commitlint/config-conventional');
   }
   // 读取模版资源
   fetchTemplate(templateName, () => {
@@ -140,7 +146,11 @@ const genFiles = (options: {
     pkgJson.scripts.build = cliAlias + ' build ' + type;
     pkgJson.version = '1.0.0';
     pkgJson.files = undefined;
-    const lints = [];
+    const lints = [
+      hasStylelint && 'yarn stylelint',
+      hasEslint && 'yarn eslint',
+      hasChangelog && 'yarn changelog'
+    ].filter(Boolean);
     let lintDir = ['src'];
     if (isLibrary) {
       lintDir = ['site', 'components'];
@@ -155,14 +165,17 @@ const genFiles = (options: {
       pkgJson.scripts['stylelint'] = lintDir
         .map((dir) => `${cliAlias} stylelint ${dir}`)
         .join(' && ');
-      lints.push(pkgJson.scripts['stylelint']);
     }
     if (hasEslint) {
-      pkgJson.scripts['eslint'] = lintDir.map((dir) => `${cliAlias} eslint ${dir}`).join(' && ');
-      lints.push(pkgJson.scripts['eslint']);
+      pkgJson.scripts['eslint'] = `${cliAlias} eslint {${lintDir.join(',')}}`;
+    }
+    if (hasChangelog) {
+      pkgJson.scripts.changelog = 'conventional-changelog -p angular -u -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md';
     }
     if (hasHusky) {
-      pkgJson.scripts.prepare = cliAlias + ' githooks pre-commit "npm run precommit"';
+      pkgJson.scripts.prepare =
+        cliAlias +
+        ' githooks pre-commit="yarn precommit" commit-msg="npx --no -- commitlint --edit \\${1}"';
       pkgJson.scripts.precommit = lints.join(' && ');
     }
     pkgJsonFetch.forEach((toolName: string) => {
@@ -286,13 +299,18 @@ const handleCreate = (
           },
           {
             key: 'tools',
-            name: 'javascript代码规范',
+            name: 'javascript、typescript代码规范',
             value: eslintPackageName,
           },
           {
             key: 'tools',
-            name: 'Git hooks钩子(precommit等)',
+            name: 'Git hooks(使用husky)',
             value: 'husky',
+          },
+          {
+            key: 'tools',
+            name: '从git commit生成Changelog',
+            value: changelogPackageName,
           },
         ],
         default: [postCssPackageName, stylelintPackageName, eslintPackageName],
