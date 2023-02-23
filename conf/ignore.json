@@ -28,26 +28,19 @@
     "package-lock.json",
     "yarn.lock"
   ],
-  ".eslintrc.yaml": [
-    "extends:",
-    "  - neko"
-  ],
-  ".prettierrc.yaml": [
-    "printWidth: 100",
-    "singleQuote: true",
-    "bracketSameLine: false"
-  ],
-  ".prettierignore": [
-    "LICENSE",
-    ".gitignore",
-    ".DS_Store",
-    ".editorconfig",
-    ".eslintignore"
-  ],
+  ".eslintrc.yaml": ["extends:", "  - neko"],
+  ".prettierrc.yaml": ["printWidth: 100", "singleQuote: true", "bracketSameLine: false"],
+  ".prettierignore": ["LICENSE", ".gitignore", ".DS_Store", ".editorconfig", ".eslintignore"],
   ".stylelintrc.yaml": [
     "extends:",
     "  - stylelint-config-moneko",
     "ignoreFiles:",
     "  - coverage/**/*"
+  ],
+  ".commitlintrc.yaml": [
+    "extends:",
+    "  - \"@commitlint/config-conventional\"",
+    "formatter: \"@commitlint/format\"",
+    "helpUrl: https://github.com/conventional-changelog/commitlint/#what-is-commitlint"
   ]
 }

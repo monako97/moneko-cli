@@ -218,6 +218,10 @@ const genFiles = (options: {
         if (hasStylelint) {
           writeFile(ignoreSrc, ignoreVal);
         }
+      } else if (ignore.includes('commitlintrc')) {
+        if (hasHusky) {
+          writeFile(ignoreSrc, ignoreVal);
+        }
       } else {
         writeFile(ignoreSrc, ignoreVal);
       }
