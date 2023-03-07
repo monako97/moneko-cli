@@ -95,8 +95,9 @@ program
   
       build.on('close', function (code) {
         if (code === 0 && args[0] === 'single-component') {
+          
           const dtsShell = [
-            'dts-bundle --name flowchart-designer --baseDir . --out umd/index.d.ts --main lib/index.d.ts',
+            `dts-bundle --name ${require(join(cwd, './package.json')).name} --baseDir . --out umd/index.d.ts --main lib/index.d.ts`,
             !hasLib && 'rm -rf lib',
           ]
             .filter(Boolean)
