@@ -1,6 +1,6 @@
 {
   "name": "@moneko/cli",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "cli",
   "engines": {
     "node": "^14.13.1 || >=16.0.0"
@@ -15,7 +15,7 @@
     "mo": "./lib/index.js"
   },
   "dependencies": {
-    "@swc/cli": "0.1.61",
+    "@swc/cli": "0.1.62",
     "archiver": "5.3.1",
     "commander": "8.1.0",
     "dts-bundle": "0.7.3",
