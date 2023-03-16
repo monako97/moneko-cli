@@ -194,7 +194,7 @@ const genFiles = (options: {
       const ignoreSrc = destination + '/' + ignore;
       let ignoreVal = ignoreConfig[ignore];
 
-      if (isLibrary) {
+      if (isLibrary && ignore.includes('eslintrc')) {
         ignoreVal = [
           ...ignoreVal,
           'rules:',
