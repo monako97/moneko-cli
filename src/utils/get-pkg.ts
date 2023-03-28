@@ -86,3 +86,7 @@ export const getLastVersion = (pkg: string, callback?: ((val: string) => string)
     }
   );
 };
+
+export function objectSort(obj: Record<string, string>) {
+  return Object.fromEntries(Object.entries(obj).sort());
+}
