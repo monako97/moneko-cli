@@ -2,34 +2,38 @@ import fs from 'fs';
 import path from 'path';
 import { program } from 'commander';
 import inquirer from 'inquirer';
-import { getLastVersion, objectSort } from './utils/get-pkg.js';
-import { writeFile, readFileSync, __dirname } from './file.js';
+import { __dirname, readFileSync, writeFile } from './file.js';
 import {
   cliAlias,
   cliName,
-  runtimePackageName,
   commonPackageName,
-  stylelintPackageName,
+  cssPackageName,
   eslintPackageName,
-  postCssPackageName,
+  huskyPackageName,
   mockPackageName,
-  requestPackageName,
+  postCssPackageName,
   reactLivePackageName,
-  changelogPackageName,
+  reactPackageName,
+  requestPackageName,
+  runtimePackageName,
+  solidJsPackageName,
+  stylelintPackageName,
 } from './utils/config.js';
+import { getLastVersion, objectSort } from './utils/get-pkg.js';
 import { fetchTemplate } from './utils/template.js';
 
+type Framework = 'react' | 'vue' | 'solid';
 const genFiles = (options: {
   name: string;
   type: string;
+  framework: Framework;
   author: string;
   tools: string[];
   destination?: string;
 }) => {
-  const { name, type, tools } = options;
+  const { name, type, framework, tools } = options;
   const isLibrary = type === 'library';
-  const isSingleComponent = type === 'single-component';
-  const templateName = `template-${isLibrary ? 'component-library' : type}`;
+  const templateName = `templet-${type}-${framework}`;
   const _destination = options.destination;
   // 项目指定生成目录，如果命令中没有有配置目录，则在当前命令运行的目录下生成以项目名称为名字的新目录
   const destination = _destination ? path.resolve(_destination) : path.resolve(process.cwd(), name);
@@ -39,27 +43,43 @@ const genFiles = (options: {
   const hasEslint = tools.includes(eslintPackageName),
     hasStylelint = tools.includes(stylelintPackageName),
     hasPostCSS = tools.includes(postCssPackageName),
-    hasChangelog = tools.includes(changelogPackageName),
-    hasHusky = tools.includes('husky'),
+    hasMock = tools.includes(mockPackageName),
+    hasChangelog = tools.includes('changelog'),
+    hasHusky = tools.includes(huskyPackageName),
+    hasCommitlint = tools.includes('commitlint'),
     packagePath = `${destination}/package.json`,
     ignoreConfig = JSON.parse(readFileSync(path.join(__dirname, '../conf/ignore.json')));
-  const dependencies = ['react', 'react-dom', commonPackageName];
-  let pkgJsonFetch = [
+  const pkgJsonFetch = [
     cliName,
     runtimePackageName,
     requestPackageName,
-    commonPackageName,
-    mockPackageName,
-    'react',
-    'react-dom',
-    '@types/react',
-    ...tools,
+    ...tools.filter((t) => !['changelog', 'commitlint'].includes(t)),
   ];
+  const dependencies: string[] = [];
+
+  switch (framework) {
+    case 'react':
+      dependencies.push('react', 'react-dom', reactPackageName);
+      pkgJsonFetch.push('react', 'react-dom', '@types/react', reactPackageName);
+      if (hasEslint) {
+        pkgJsonFetch.push('eslint-plugin-react-hooks', 'eslint-plugin-react');
+      }
+      break;
+    case 'solid':
+      dependencies.push('solid-js', solidJsPackageName);
+      pkgJsonFetch.push('solid-js', solidJsPackageName);
+      if (hasEslint) {
+        pkgJsonFetch.push('eslint-plugin-solid');
+      }
+      break;
+    default:
+      break;
+  }
 
   if (hasStylelint && !hasPostCSS) {
     pkgJsonFetch.push(postCssPackageName);
   }
-  if (hasHusky) {
+  if (hasCommitlint) {
     pkgJsonFetch.push('@commitlint/cli');
     pkgJsonFetch.push('@commitlint/config-conventional');
   }
@@ -89,6 +109,9 @@ const genFiles = (options: {
           .replace(/PackageNameByEslint/g, eslintPackageName)
           .replace(/PackageNameByPostCss/g, postCssPackageName)
           .replace(/PackageNameByReactLive/g, reactLivePackageName)
+          .replace(/PackageNameByReact/g, reactPackageName)
+          .replace(/PackageNameByCSS/g, cssPackageName)
+          .replace(/PackageNameBySolid/g, solidJsPackageName)
           .replace(/libraryNameTemplate/g, name);
         writeFile(path.join(destination, filename), global.templates[key]);
       }
@@ -96,6 +119,9 @@ const genFiles = (options: {
 
     const pkgJson = JSON.parse(global.templates['package/package.json']);
 
+    if (!pkgJson.dependencies) {
+      pkgJson.dependencies = {};
+    }
     writeFile(
       `${destination}/README.md`,
       readFileSync(path.join(__dirname, '../conf/README.md'))
@@ -104,8 +130,8 @@ const genFiles = (options: {
     );
     pkgJson.name = options.name;
     pkgJson.author = options.author;
-    pkgJson.scripts.start = `${cliAlias} start ${type}`;
-    pkgJson.scripts.build = `${cliAlias} build ${type}`;
+    pkgJson.scripts.start = `${cliAlias} start ${type} ${framework}`;
+    pkgJson.scripts.build = `${cliAlias} build ${type} ${framework}`;
     pkgJson.version = '1.0.0';
     pkgJson.files = undefined;
     const lints = [
@@ -114,26 +140,21 @@ const genFiles = (options: {
       hasChangelog && 'yarn changelog',
     ].filter(Boolean);
     let lintDir = ['src'];
+
     if (isLibrary) {
       lintDir = ['components', 'site'];
       pkgJson.files = ['LICENSE', 'README.md', 'es', 'lib'];
     }
-    if (isSingleComponent) {
-      lintDir = ['example', 'src'];
-      pkgJson.files = ['README.md', 'example', 'lib', 'umd'];
-    }
 
     if (hasStylelint) {
-      pkgJson.scripts['stylelint'] = lintDir
-        .map((dir) => `${cliAlias} stylelint ${dir}`)
-        .join(' && ');
+      pkgJson.scripts.stylelint = lintDir.map((dir) => `${cliAlias} stylelint ${dir}`).join(' && ');
     }
     if (hasEslint) {
-      pkgJson.scripts['eslint'] = `${cliAlias} eslint {${lintDir.join(',')}}`;
+      const lintStr = lintDir.length > 1 ? `{${lintDir.join(',')}}` : lintDir[0];
+      pkgJson.scripts.eslint = `${cliAlias} eslint ${lintStr}`;
     }
     if (hasChangelog) {
-      pkgJson.scripts.changelog =
-        'conventional-changelog -p angular -u -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md';
+      pkgJson.scripts.changelog = `${cliAlias} changelog CHANGELOG.md && git add CHANGELOG.md`;
     }
     if (hasHusky) {
       pkgJson.scripts.prepare = `${cliAlias} githooks pre-commit="yarn precommit" commit-msg="npx --no -- commitlint --edit \${1}"`;
@@ -155,19 +176,33 @@ const genFiles = (options: {
       const ignoreSrc = `${destination}/${ignore}`;
       let ignoreVal = ignoreConfig[ignore];
 
-      if (isLibrary && ignore.includes('eslintrc')) {
+      if (ignore.includes('eslintrc')) {
+        let frameworkLint: string[] = [];
+
+        if (framework === 'solid') {
+          frameworkLint = ['  - plugin:solid/recommended', 'plugins:', '  - solid'];
+        } else if (framework === 'react') {
+          frameworkLint = [
+            '  - plugin:react/recommended',
+            '  - plugin:react-hooks/recommended',
+            'plugins:',
+            '  - react',
+            '  - react-hooks',
+          ];
+        }
         ignoreVal = [
           ...ignoreVal,
+          ...frameworkLint,
           'rules:',
           '  import/no-unresolved:',
           '    - 2',
           '    - ignore:',
           '      - \\?raw$',
-          '      - ^@pkg',
           '      - ^@/',
-          '      - components',
-          '      - ^libraryNameTemplate',
-        ];
+          '      - ^@app',
+          isLibrary && '      - ^@pkg',
+          isLibrary && '      - ^libraryNameTemplate',
+        ].filter(Boolean);
       }
       ignoreVal = ignoreVal.join('\n').replace(/libraryNameTemplate/g, name);
 
@@ -181,6 +216,10 @@ const genFiles = (options: {
         }
       } else if (ignore.includes('commitlintrc')) {
         if (hasHusky) {
+          writeFile(ignoreSrc, ignoreVal);
+        }
+      } else if (ignore.includes('mock')) {
+        if (hasMock) {
           writeFile(ignoreSrc, ignoreVal);
         }
       } else {
@@ -219,8 +258,8 @@ const handleCreate = (
         choices: [
           {
             key: 'type',
-            name: '后台管理(back-stage)',
-            value: 'back-stage',
+            name: '后台管理(Backstage)',
+            value: 'backstage',
           },
           {
             key: 'type',
@@ -229,23 +268,35 @@ const handleCreate = (
           },
           {
             key: 'type',
-            name: '微应用(single-spa)',
-            value: 'single-spa',
+            name: '微前端(Micro Frontends)',
+            value: 'micro',
           },
           {
             key: 'type',
-            name: '移动端 H5应用(mobile)',
+            name: '移动端 H5应用(Mobile)',
             value: 'mobile',
           },
           {
             key: 'type',
-            name: '独立组件(npm package)',
-            value: 'single-component',
+            name: '组件库(Component Library)',
+            value: 'library',
+          },
+        ],
+      },
+      {
+        type: 'list',
+        name: 'framework',
+        message: '框架',
+        choices: [
+          {
+            key: 'framework',
+            name: 'React',
+            value: 'react',
           },
           {
-            key: 'type',
-            name: '组件库(npm package)',
-            value: 'library',
+            key: 'framework',
+            name: 'Solid.js',
+            value: 'solid',
           },
         ],
       },
@@ -254,6 +305,11 @@ const handleCreate = (
         name: 'tools',
         message: '请选择需要开启的开发辅助功能',
         choices: [
+          {
+            key: 'tools',
+            name: 'Mock数据',
+            value: mockPackageName,
+          },
           {
             key: 'tools',
             name: 'css后处理(压缩、Hack、单位换算等)',
@@ -271,16 +327,21 @@ const handleCreate = (
           },
           {
             key: 'tools',
-            name: 'Git hooks(使用husky)',
-            value: 'husky',
+            name: '根据 commit 信息生成 Changelog',
+            value: 'changelog',
           },
           {
             key: 'tools',
-            name: '从git commit生成Changelog',
-            value: changelogPackageName,
+            name: 'Git commit 规范',
+            value: 'commitlint',
+          },
+          {
+            key: 'tools',
+            name: 'Git hooks(使用husky)',
+            value: huskyPackageName,
           },
         ],
-        default: [postCssPackageName, stylelintPackageName, eslintPackageName],
+        default: [postCssPackageName, stylelintPackageName, eslintPackageName, mockPackageName],
       },
     ])
     .then((answers) => {

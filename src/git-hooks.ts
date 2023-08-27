@@ -1,5 +1,5 @@
 import { program } from 'commander';
-import { runLint } from './runlint';
+import { runLint } from './runlint.js';
 
 program
   .command('githooks')

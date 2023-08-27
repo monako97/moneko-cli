@@ -1,7 +1,7 @@
 import { extname, join, resolve } from 'path';
 import { unlink, readFile, writeFile, readdirSync, statSync, existsSync } from 'fs';
 import { exec } from 'child_process';
-import { nodePath, runtimePackageName } from './utils/config';
+import { nodePath, runtimePackageName } from './utils/config.js';
 
 let modifyVarBash = '';
 const cwd = process.cwd();
@@ -86,14 +86,14 @@ function walk(dir: string) {
   return results;
 }
 
-export function lesscCommonjs() {
+export async function lesscCommonjs() {
   const arr = walk(join(cwd, './lib'));
 
   if (arr && arr.length) {
-    const modifyVars = require(resolve(
-        cwd,
-      `./node_modules/${runtimePackageName}/build/modifyVars.js`
-    )).default;
+    const modifyVars = (await import(resolve(
+      cwd,
+    `./node_modules/${runtimePackageName}/lib/modifyVars.js`
+    ))).default;
 
     for (const k in modifyVars) {
       if (Object.hasOwnProperty.call(modifyVars, k)) {

@@ -11,24 +11,23 @@ const cwd = process.cwd();
 const spawnOptions: SpawnOptions = { stdio: 'inherit', shell: true };
 
 program
-  .command('build <type>')
+  .command('build <type> <framework>')
   .description('编译项目')
-  .action((type, ...cmd) => {
+  .action((type, framework, ...cmd) => {
     if (!type) {
       process.stdout.write(chalk.red('type: 无效值 ' + chalk.gray(type)));
       process.exit(1);
     }
     getLastVersion(cliName, null, true);
-    const args = cmd[1].args;
+    const args = cmd[1].args.slice(2);
     const hasDocs = !args.includes('no-docs');
     const hasLib = !args.includes('no-lib');
     const hasEs = !args.includes('no-es');
-    const tsconfig = relative(process.cwd(), `tsconfig.json`);
     const confPath = relative(
       process.cwd(),
-      `./node_modules/${runtimePackageName}/build/webpack.prod`
+      `./node_modules/${runtimePackageName}/lib/webpack.prod.js`
     );
-    const shellSrc = `${nodePath}npx cross-env NODE_ENV=production APPTYPE=${args
+    const shellSrc = `${nodePath}npx cross-env NODE_ENV=production APPTYPE=${type} FRAMEWORK=${framework} ${args
       .filter((a: string) => !['no-docs', 'no-es', 'no-lib'].includes(a))
       .join(' ')} webpack --config ${confPath}`;
 
@@ -61,52 +60,39 @@ program
             }
           }
         });
+        const tsconfig: Record<typeof framework, { jsx: string; jsxImportSource: string }> = {
+          react: {
+            jsx: 'react-jsx',
+            jsxImportSource: 'react',
+          },
+          solid: {
+            jsx: 'preserve',
+            jsxImportSource: 'solid-js',
+          },
+          vue: {
+            jsx: 'vue',
+            jsxImportSource: 'vue',
+          }
+        }
+        if (!(framework in tsconfig)) {
+          process.stdout.write(chalk.red('framework: 无效值 ' + chalk.gray(framework)));
+          process.exit(1);
+        }
         // 编译类型文件
         spawn(
           `${nodePath}npx tsc --project ${join(
             cwd,
             `./node_modules/${cliName}/conf/pkg.json`
-          )} --outDir ${buildLib[i].dir}`,
+          )} --jsx ${tsconfig[framework].jsx} --jsxImportSource ${tsconfig[framework].jsxImportSource} --outDir ${buildLib[i].dir}`,
           spawnOptions
         );
       }
     }
     if (args[0] !== 'library' || (hasDocs && args[0] === 'library')) {
-      if (args[0] === 'single-component') {
-        const cjsShell = [
-          'rm -rf lib',
-          hasLib && 'swc src -d lib -C module.type=es6 -C minify=true -s --copy-files',
-          `tsc --project ${tsconfig}`,
-        ]
-          .filter(Boolean)
-          .join(' && ');
-        const cjsBuild = spawn(cjsShell, {
-          stdio: 'inherit',
-          shell: true,
-        });
-  
-        cjsBuild.on('close', function (code) {
-          if (code !== 0) {
-            process.exit(0);
-          }
-        });
-      }
       const build = spawn(shellSrc, spawnOptions);
   
-      build.on('close', function (code) {
-        if (code === 0 && args[0] === 'single-component') {
-          
-          const dtsShell = [
-            `dts-bundle --name ${require(join(cwd, './package.json')).name} --baseDir . --out umd/index.d.ts --main lib/index.d.ts`,
-            !hasLib && 'rm -rf lib',
-          ]
-            .filter(Boolean)
-            .join(' && ');
-          spawn(dtsShell, {
-            stdio: 'inherit',
-            shell: true,
-          });
-        }
+      build.on('close', async function (code) {
+        process.exit(0);
       });
     }
   });
