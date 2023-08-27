@@ -1,7 +1,7 @@
 import path from 'path';
 import { program } from 'commander';
-import { runLint } from './runlint';
-import { nodePath } from './utils/config';
+import { runLint } from './runlint.js';
+import { nodePath } from './utils/config.js';
 
 program
   .command('eslint <soucre>')

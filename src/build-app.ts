@@ -5,7 +5,7 @@ import readline from 'readline';
 import { program } from 'commander';
 import inquirer, { InputQuestion } from 'inquirer';
 import shell from 'shelljs';
-import { bundleApk, bundleIpa } from './utils/bundle-app';
+import { bundleApk, bundleIpa } from './utils/bundle-app.js';
 import {
   jsonToPlist,
   jsonToXml,

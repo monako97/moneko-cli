@@ -1,7 +1,7 @@
 import path from 'path';
 import { program } from 'commander';
-import { nodePath } from './utils/config';
-import { runLint } from './runlint';
+import { nodePath } from './utils/config.js';
+import { runLint } from './runlint.js';
 
 program
   .command('stylelint <soucre>')

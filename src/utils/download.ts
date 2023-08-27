@@ -2,7 +2,7 @@ import https from 'https';
 import http from 'http';
 import zlib from 'zlib';
 import fs from 'fs';
-import { isFunc } from './get-pkg';
+import { isFunc } from './get-pkg.js';
 
 global.templates = {};
 
