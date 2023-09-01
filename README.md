@@ -17,3 +17,23 @@
 [download-tag]: https://img.shields.io/npm/dm/@moneko/cli.svg?logo=docusign
 [cd-tag]: https://github.com/monako97/neko-cli/actions/workflows/cd.yml/badge.svg
 [cd-url]: https://github.com/monako97/neko-cli/actions/workflows/cd.yml
+
+## 使用
+
+### 创建项目
+
+```sh
+mo create <app-name>
+```
+
+## 启动项目
+
+```
+mo start <app-type> <framework>
+```
+
+## 打包项目
+
+```
+mo build <app-type> <framework>
+```
