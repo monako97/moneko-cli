@@ -92,60 +92,70 @@ program
   .command('changelog <filename>')
   .description('生成 CHANGELOG.md')
   .action((filename) => {
-    const remoteUrl = getRemoteUrl();
-    const tags = getTags(remoteUrl);
     const text: string[] = ['# Change log'];
+    try {
+      execSync('git show-ref --quiet --verify "refs/heads/$(git rev-parse --abbrev-ref HEAD)";');
 
-    tags.forEach((t, i) => {
-      if (i) {
-        const sliceLog = getCommitsBetweenTags(tags[i - 1].tag, t.tag);
+      const remoteUrl = getRemoteUrl();
+      const tags = getTags(remoteUrl);
 
-        sliceLog.forEach((s) => {
-          if (s.type) {
-            const old = tags[i].logs[s.type] || [];
+      tags.forEach((t, i) => {
+        if (i) {
+          const sliceLog = getCommitsBetweenTags(tags[i - 1].tag, t.tag);
 
-            old.push(
-              `- ${s.message} ([${s.commitId.substring(0, 7)}](${remoteUrl}/commit/${s.commitId}))`
-            );
-            Object.assign(tags[i].logs, {
-              [s.type]: old,
-            });
-          }
-        });
-      }
-      if (i === tags.length - 1) {
-        const otherLog = getCommitsBetweenTags(t.tag);
+          sliceLog.forEach((s) => {
+            if (s.type) {
+              const old = tags[i].logs[s.type] || [];
 
-        if (otherLog.length) {
-          tags.push({
-            title: `## Last`,
-            logs: {},
+              old.push(
+                `- ${s.message} ([${s.commitId.substring(0, 7)}](${remoteUrl}/commit/${
+                  s.commitId
+                }))`
+              );
+              Object.assign(tags[i].logs, {
+                [s.type]: old,
+              });
+            }
           });
         }
-        otherLog.forEach((s) => {
-          if (s.type) {
-            const old = tags[i + 1].logs[s.type] || [];
-            old.push(
-              `- ${s.message} ([${s.commitId.substring(0, 7)}](${remoteUrl}/commit/${s.commitId}))`
-            );
-            Object.assign(tags[i + 1].logs, {
-              [s.type]: old,
+        if (i === tags.length - 1) {
+          const otherLog = getCommitsBetweenTags(t.tag);
+
+          if (otherLog.length) {
+            tags.push({
+              title: `## Last`,
+              logs: {},
             });
           }
-        });
-      }
-    });
-
-    tags.reverse().forEach((e) => {
-      text.push(`\n${e.title}`);
-
-      for (const key in e.logs) {
-        if (Object.prototype.hasOwnProperty.call(e.logs, key)) {
-          text.push(`\n### ${key}\n`);
-          e.logs[key].forEach((l) => text.push(l));
+          otherLog.forEach((s) => {
+            if (s.type) {
+              const old = tags[i + 1].logs[s.type] || [];
+              old.push(
+                `- ${s.message} ([${s.commitId.substring(0, 7)}](${remoteUrl}/commit/${
+                  s.commitId
+                }))`
+              );
+              Object.assign(tags[i + 1].logs, {
+                [s.type]: old,
+              });
+            }
+          });
         }
-      }
-    });
+      });
+
+      tags.reverse().forEach((e) => {
+        text.push(`\n${e.title}`);
+
+        for (const key in e.logs) {
+          if (Object.prototype.hasOwnProperty.call(e.logs, key)) {
+            text.push(`\n### ${key}\n`);
+            e.logs[key].forEach((l) => text.push(l));
+          }
+        }
+      });
+    } catch (error) {
+      text.push('\n当前分支尚无任何提交\n');
+    }
 
     writeFileSync(join(process.cwd(), filename), text.join('\n'), {
       encoding: 'utf-8',
