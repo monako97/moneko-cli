@@ -101,7 +101,7 @@ program
     }
     const confPath = path.relative(
       process.cwd(),
-      `./node_modules/${runtimePackageName}/lib/webpack.dev.js`
+      `./node_modules/${runtimePackageName}/lib/dev.js`
     );
     const shellSrc = `${nodePath}npx cross-env NODE_ENV=development APPTYPE=${type} FRAMEWORK=${framework} ${args.join(
       ' '
