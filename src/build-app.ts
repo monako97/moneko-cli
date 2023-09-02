@@ -27,7 +27,7 @@ const createApp = async () => {
         type: 'input',
         name: 'bundleId',
         message: '请输入软件包名称?',
-        default: 'com.myoucai.bid',
+        default: 'com.moneko.bid',
         validate: function (input: string) {
           const done = (this as unknown as InputQuestions).async();
           const isOk = /(^com\.)([a-zA-Z_][a-zA-Z0-9_]*[.])*([a-zA-Z_][a-zA-Z0-9_]*)$/.test(input);
