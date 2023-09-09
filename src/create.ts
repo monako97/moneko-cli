@@ -352,8 +352,7 @@ const handleCreate = (
       genFiles({ ...answers, ...params, ...options });
     })
     .catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error(error);
+      throw new Error(error);
     });
 };
 

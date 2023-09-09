@@ -12,8 +12,9 @@ export const writeFile = (filePath: string, value: Buffer | string) => {
     shell.mkdir('-p', path.dirname(filePath).replace(/\\$/g, '\\$'));
   }
   fs.writeFile(filePath, value, 'utf-8', (err) => {
-    // eslint-disable-next-line no-console
-    if (err) console.error(err);
+    if (err) {
+      throw err;
+    };
   });
 };
 

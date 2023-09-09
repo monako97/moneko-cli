@@ -6,7 +6,7 @@ import { nodePath } from './config.js';
 export const fetchTemplate = (pkgName: string, onFinish?: () => void) => {
   const registryURL = shell
     .exec(`${nodePath}npm config get registry`, {
-      silent: true
+      silent: true,
     })
     .stdout.replace(/\n/g, '');
 
@@ -14,20 +14,19 @@ export const fetchTemplate = (pkgName: string, onFinish?: () => void) => {
     `${nodePath}npm view ${pkgName} version`,
     {
       silent: true,
-      async: true
+      async: true,
     },
     function (_code, stdout, stderr) {
       if (stderr) {
-        console.error(stderr);
-        return;
+        throw stderr;
       }
       const version = stdout.replace(/\n/g, '');
       const url = `${registryURL}${pkgName}/-/${pkgName}-${version}.tgz`;
 
-      downloadFile(url, null, (state, pro, currPro, total) => {
+      downloadFile(url, null, (state, pro = '0', currPro, total) => {
         if (state == 'data') {
           progress(
-            parseFloat(pro || '0'),
+            parseFloat(pro),
             pro === '100.00' ? '✨生成完成: ' : '正在生成: ',
             currPro + 'k/' + total + 'k'
           );

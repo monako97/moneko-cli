@@ -55,4 +55,4 @@ yarn build config=prod
 
 ## 配置文档
 
-[click](https://monako97.github.io/neko-ui/@moneko/core)
+[click](https://monako97.github.io/neko-ui/@moneko/config)
