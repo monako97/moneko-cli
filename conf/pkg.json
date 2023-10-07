@@ -1,24 +1,5 @@
 {
-  "compilerOptions": {
-    "downlevelIteration": true,
-    "target": "es2015",
-    "jsx": "react-jsx",
-    "moduleResolution": "node",
-    "baseUrl": ".",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-    "declaration": true,
-    "emitDeclarationOnly": true,
-    "preserveConstEnums": true,
-    "newLine": "lf",
-    "rootDir": "../../../../components",
-    "lib": ["DOM", "es2016"],
-    "typeRoots": ["../../../../node_modules/@types", "../../../../typings"]
-  },
+  "extends": "../../../../tsconfig.json",
   "include": ["../../../../components", "../../../../typings"],
   "exclude": ["../../../../components/**/examples/*", "../../../../components/**/__tests__/*", "../../../../components/**/__mocks__/*"]
 }

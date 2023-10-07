@@ -31,7 +31,7 @@ program
       .filter((a: string) => !['no-docs', 'no-es', 'no-lib'].includes(a))
       .join(' ')} webpack --config ${confPath}`;
 
-    if (args[0] === 'library') {
+    if (type === 'library') {
       const buildLib = [
         hasLib && { type: 'commonjs', dir: 'lib' },
         hasEs && { type: 'es6 -C jsc.target=es2015', dir: 'es' },
@@ -45,10 +45,7 @@ program
 
         spawn(`rm -rf ${dir}`, spawnOptions);
         // 编译 package
-        const swc = spawn(
-          `${nodePath}npx swc components -d ${buildLib[i].dir} -C module.type=${buildLib[i].type} -C minify=true -C jsc.parser.tsx=true -C jsc.parser.syntax=typescript --copy-files`,
-          spawnOptions
-        );
+        const swc = spawn(`${nodePath}npx swc components -d ${buildLib[i].dir} --config-file ${join(cwd, `./node_modules/${cliName}/conf/swc`)}  -C module.type=${buildLib[i].type} --copy-files`, spawnOptions);
 
         swc.on('close', function (code) {
           if (code === 0) {
@@ -88,10 +85,10 @@ program
         );
       }
     }
-    if (args[0] !== 'library' || (hasDocs && args[0] === 'library')) {
+    if (type !== 'library' || (hasDocs && type === 'library')) {
       const build = spawn(shellSrc, spawnOptions);
   
-      build.on('close', async function (code) {
+      build.on('close', async function () {
         process.exit(0);
       });
     }

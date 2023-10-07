@@ -92,7 +92,7 @@ export async function lesscCommonjs() {
   if (arr && arr.length) {
     const modifyVars = (await import(resolve(
       cwd,
-    `./node_modules/${runtimePackageName}/lib/modifyVars.js`
+    `./node_modules/${runtimePackageName}/lib/modify-vars.js`
     ))).default;
 
     for (const k in modifyVars) {
