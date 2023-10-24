@@ -46,7 +46,7 @@ program
           `${nodePath}npx swc components -d ${buildLib[i].dir} --config-file ${join(
             cwd,
             `./node_modules/${cliName}/conf/swc`,
-          )}  -C module.type=${buildLib[i].type} --copy-files`,
+          )} -C jsc.experimental.cacheRoot=${process.cwd()}/node_modules/.swc -C module.type=${buildLib[i].type} --copy-files`,
           spawnOptions,
         );
 
