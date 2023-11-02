@@ -26,7 +26,7 @@ program
     const confPath = relative(process.cwd(), `./node_modules/${runtimePackageName}/lib/prod.js`);
     const shellSrc = `${nodePath}npx cross-env NODE_ENV=production APPTYPE=${type} FRAMEWORK=${framework} ${args
       .filter((a: string) => !['no-docs', 'no-es', 'no-lib'].includes(a))
-      .join(' ')} webpack --config ${confPath}`;
+      .join(' ')} ${nodePath}node ${confPath}`;
 
     if (type === 'library') {
       const buildLib = [

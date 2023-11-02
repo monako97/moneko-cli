@@ -36,9 +36,10 @@ const commonPath = path.resolve(
 );
 function restart() {
   if (startStatus) return;
-  readline.cursorTo(process.stdout, 0);
-  process.stdout.write(chalk.yellow('配置已更新, 正在重新部署...'));
   startStatus = true;
+  process.stdout.write('\x1B[2J\x1B[3J\x1B[H');
+  readline.cursorTo(process.stdout, 0);
+  process.stdout.write(chalk.yellow('配置已更新, 正在重新部署...\n'));
   if (child) {
     import(commonPath).then((v) => {
       DEVSERVERPORT = global.NEKOCLICONFIG.CONFIG.devServer.port;
@@ -47,7 +48,6 @@ function restart() {
           shell.exec(`netstat -ano | grep :${DEVSERVERPORT}`, {
             silent: true,
           }).stdout || '';
-
         const plist: string[] = [];
 
         stdout.split('\n').forEach(function (line) {
@@ -77,12 +77,13 @@ function watchCustomConfig() {
   const configPath = path.resolve(process.cwd(), './config/index.ts');
 
   if (fs.existsSync(configPath)) {
-    fs.unwatchFile(configPath);
-    fs.watchFile(configPath, {}, function () {
-      restart();
+    const w = fs.watch(configPath, (_, filename) => {
+      if (filename === 'index.ts' || filename == `${global.NEKOCLICONFIG.CUSTOMCONFIG}.ts`) {
+        restart();
+      }
     });
   } else {
-    process.stdout.write('没有发现自定义配置\n');
+    process.stdout.write(chalk.grey('没有发现自定义配置\n'));
   }
 }
 program
@@ -105,7 +106,7 @@ program
     );
     const shellSrc = `${nodePath}npx cross-env NODE_ENV=development APPTYPE=${type} FRAMEWORK=${framework} ${args.join(
       ' '
-    )} webpack serve --config ${confPath}`;
+    )} ${nodePath}node ${confPath}`;
 
     if (!watchConfig) {
       watchCustomConfig();
