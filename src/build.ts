@@ -45,7 +45,7 @@ program
         const swc = spawn(
           `${nodePath}npx swc components -d ${buildLib[i].dir} --config-file ${join(
             cwd,
-            `./node_modules/${cliName}/conf/swc`,
+            `./node_modules/${cliName}/conf/swc-${framework}`,
           )} -C jsc.experimental.cacheRoot=${process.cwd()}/node_modules/.swc -C module.type=${buildLib[i].type} --copy-files`,
           spawnOptions,
         );

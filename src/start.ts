@@ -32,7 +32,7 @@ function start(execText?: string) {
 }
 const commonPath = path.resolve(
   process.cwd(),
-  `./node_modules/${runtimePackageName}/lib/common.js`
+  `./node_modules/${runtimePackageName}/lib/config.js`
 );
 function restart() {
   if (startStatus) return;
