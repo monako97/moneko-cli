@@ -11,7 +11,6 @@ import {
   eslintPackageName,
   huskyPackageName,
   mockPackageName,
-  postCssPackageName,
   reactLivePackageName,
   reactPackageName,
   requestPackageName,
@@ -42,7 +41,6 @@ const genFiles = (options: {
   if (!fs.existsSync(destination)) fs.mkdirSync(destination);
   const hasEslint = tools.includes(eslintPackageName),
     hasStylelint = tools.includes(stylelintPackageName),
-    hasPostCSS = tools.includes(postCssPackageName),
     hasMock = tools.includes(mockPackageName),
     hasChangelog = tools.includes('changelog'),
     hasHusky = tools.includes(huskyPackageName),
@@ -79,9 +77,6 @@ const genFiles = (options: {
       break;
   }
 
-  if (hasStylelint && !hasPostCSS) {
-    pkgJsonFetch.push(postCssPackageName);
-  }
   if (hasCommitlint) {
     pkgJsonFetch.push('@commitlint/cli');
     pkgJsonFetch.push('@commitlint/config-conventional');
@@ -110,7 +105,6 @@ const genFiles = (options: {
           .replace(/PackageNameByRequest/g, requestPackageName)
           .replace(/PackageNameByStylelint/g, stylelintPackageName)
           .replace(/PackageNameByEslint/g, eslintPackageName)
-          .replace(/PackageNameByPostCss/g, postCssPackageName)
           .replace(/PackageNameByReactLive/g, reactLivePackageName)
           .replace(/PackageNameByReact/g, reactPackageName)
           .replace(/PackageNameByCSS/g, cssPackageName)
@@ -315,11 +309,6 @@ const handleCreate = (
           },
           {
             key: 'tools',
-            name: 'css后处理(压缩、Hack、单位换算等)',
-            value: postCssPackageName,
-          },
-          {
-            key: 'tools',
             name: 'css代码规范',
             value: stylelintPackageName,
           },
@@ -344,7 +333,7 @@ const handleCreate = (
             value: huskyPackageName,
           },
         ],
-        default: [postCssPackageName, stylelintPackageName, eslintPackageName, mockPackageName],
+        default: [stylelintPackageName, eslintPackageName, mockPackageName],
       },
     ])
     .then((answers) => {

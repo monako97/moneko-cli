@@ -8,7 +8,6 @@ export const runtimePackageName = `@${anthor}/core`;
 export const mockPackageName = `@${anthor}/mock`;
 export const commonPackageName = `@${anthor}/common`;
 export const requestPackageName = `@${anthor}/request`;
-export const postCssPackageName = `@${anthor}/postcss`;
 export const cssPackageName = `@${anthor}/css`;
 export const reactLivePackageName = `@${anthor}/react-live`;
 export const reactPackageName = `@${anthor}/react`;

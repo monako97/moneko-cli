@@ -1,33 +1,16 @@
 import { extname, join, resolve } from 'path';
-import { unlink, readFile, writeFile, readdirSync, statSync, existsSync } from 'fs';
+import { readFile, writeFile, readdirSync, statSync, existsSync } from 'fs';
 import { exec } from 'child_process';
 import { nodePath, runtimePackageName } from './utils/config.js';
 
 let modifyVarBash = '';
 const cwd = process.cwd();
-const postcssConf = existsSync(join(cwd, 'postcss.config.js')) ? join(cwd, 'postcss.config.js') : null;
-
-function postcss(file: string, outputPath: string) {
-  return new Promise((resolve, reject) => {
-    if (postcssConf) {
-      exec(
-        `${nodePath}npx postcss ${outputPath} -o ${outputPath}`,
-        function (error) {
-          if (error) return reject(error);
-          resolve(unlink(file, (err) => err));
-        }
-      );
-    } else {
-      resolve(unlink(file, (err) => err));
-    }
-  });
-}
 
 function lessc({ file, outputPath }: { file: string; outputPath: string }) {
   return new Promise((resolve, reject) => {
     exec(`${nodePath}npx lessc --js ${modifyVarBash} ${file} > ${outputPath}`, function (error) {
       if (error) return reject(error);
-      resolve(postcss(file, outputPath));
+      resolve(true);
     });
   });
 }
@@ -90,10 +73,9 @@ export async function lesscCommonjs() {
   const arr = walk(join(cwd, './lib'));
 
   if (arr && arr.length) {
-    const modifyVars = (await import(resolve(
-      cwd,
-    `./node_modules/${runtimePackageName}/lib/modify-vars.js`
-    ))).default;
+    const modifyVars = (
+      await import(resolve(cwd, `./node_modules/${runtimePackageName}/lib/modify-vars.js`))
+    ).default;
 
     for (const k in modifyVars) {
       if (Object.hasOwnProperty.call(modifyVars, k)) {
