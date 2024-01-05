@@ -4,15 +4,13 @@ const nodeDir = path.join(path.dirname(process.execPath).replace(/(\s+)/g, '\\$1
 const anthor = 'moneko';
 export const nodePath = process.platform === 'win32' ? '' : nodeDir;
 export const cliPkgJson = JSON.parse(readFileSync(path.join(__dirname, '../package.json')));
-export const runtimePackageName = `@${anthor}/core`;
-export const mockPackageName = `@${anthor}/mock`;
+export const corePackageName = `@${anthor}/core`;
 export const commonPackageName = `@${anthor}/common`;
 export const requestPackageName = `@${anthor}/request`;
 export const cssPackageName = `@${anthor}/css`;
-export const reactLivePackageName = `@${anthor}/react-live`;
 export const reactPackageName = `@${anthor}/react`;
 export const solidJsPackageName = `@${anthor}/solid`;
-// export const vuePackageName = `@${anthor}/vue`;
+export const vuePackageName = `@${anthor}/vue`;
 export const jestPackageName = 'jest';
 export const eslintPackageName = `eslint-config-neko`;
 export const stylelintPackageName = `stylelint-config-${anthor}`;

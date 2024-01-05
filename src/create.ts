@@ -7,16 +7,15 @@ import {
   cliAlias,
   cliName,
   commonPackageName,
+  corePackageName,
   cssPackageName,
   eslintPackageName,
   huskyPackageName,
-  mockPackageName,
-  reactLivePackageName,
   reactPackageName,
   requestPackageName,
-  runtimePackageName,
   solidJsPackageName,
   stylelintPackageName,
+  vuePackageName,
 } from './utils/config.js';
 import { getLastVersion, objectSort } from './utils/get-pkg.js';
 import { fetchTemplate } from './utils/template.js';
@@ -41,7 +40,6 @@ const genFiles = (options: {
   if (!fs.existsSync(destination)) fs.mkdirSync(destination);
   const hasEslint = tools.includes(eslintPackageName),
     hasStylelint = tools.includes(stylelintPackageName),
-    hasMock = tools.includes(mockPackageName),
     hasChangelog = tools.includes('changelog'),
     hasHusky = tools.includes(huskyPackageName),
     hasCommitlint = tools.includes('commitlint'),
@@ -49,7 +47,7 @@ const genFiles = (options: {
     ignoreConfig = JSON.parse(readFileSync(path.join(__dirname, '../conf/ignore.json')));
   const pkgJsonFetch = [
     cliName,
-    runtimePackageName,
+    corePackageName,
     requestPackageName,
     ...tools.filter((t) => !['changelog', 'commitlint'].includes(t)),
   ];
@@ -99,16 +97,15 @@ const genFiles = (options: {
 
         global.templates[key] = global.templates[key]
           .replace(/PackageNameByCli/g, cliName)
-          .replace(/PackageNameByCore/g, runtimePackageName)
-          .replace(/PackageNameByMock/g, mockPackageName)
+          .replace(/PackageNameByCore/g, corePackageName)
           .replace(/PackageNameByCommon/g, commonPackageName)
           .replace(/PackageNameByRequest/g, requestPackageName)
           .replace(/PackageNameByStylelint/g, stylelintPackageName)
           .replace(/PackageNameByEslint/g, eslintPackageName)
-          .replace(/PackageNameByReactLive/g, reactLivePackageName)
           .replace(/PackageNameByReact/g, reactPackageName)
           .replace(/PackageNameByCSS/g, cssPackageName)
           .replace(/PackageNameBySolid/g, solidJsPackageName)
+          .replace(/PackageNameByVue/g, vuePackageName)
           .replace(/libraryNameTemplate/g, name);
         writeFile(path.join(destination, filename), global.templates[key]);
       }
@@ -215,10 +212,6 @@ const genFiles = (options: {
         if (hasHusky) {
           writeFile(ignoreSrc, ignoreVal);
         }
-      } else if (ignore.includes('mock')) {
-        if (hasMock) {
-          writeFile(ignoreSrc, ignoreVal);
-        }
       } else {
         writeFile(ignoreSrc, ignoreVal);
       }
@@ -304,11 +297,6 @@ const handleCreate = (
         choices: [
           {
             key: 'tools',
-            name: 'Mock数据',
-            value: mockPackageName,
-          },
-          {
-            key: 'tools',
             name: 'css代码规范',
             value: stylelintPackageName,
           },
@@ -333,7 +321,7 @@ const handleCreate = (
             value: huskyPackageName,
           },
         ],
-        default: [stylelintPackageName, eslintPackageName, mockPackageName],
+        default: [stylelintPackageName, eslintPackageName],
       },
     ])
     .then((answers) => {

@@ -1,7 +1,7 @@
 import { extname, join, resolve } from 'path';
-import { readFile, writeFile, readdirSync, statSync, existsSync } from 'fs';
+import { readFile, writeFile, readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
-import { nodePath, runtimePackageName } from './utils/config.js';
+import { nodePath, corePackageName } from './utils/config.js';
 
 let modifyVarBash = '';
 const cwd = process.cwd();
@@ -74,7 +74,7 @@ export async function lesscCommonjs() {
 
   if (arr && arr.length) {
     const modifyVars = (
-      await import(resolve(cwd, `./node_modules/${runtimePackageName}/lib/modify-vars.js`))
+      await import(resolve(cwd, `./node_modules/${corePackageName}/lib/options/modify-vars.mjs`))
     ).default;
 
     for (const k in modifyVars) {

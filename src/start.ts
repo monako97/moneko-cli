@@ -5,7 +5,7 @@ import child_process from 'child_process';
 import chalk from 'chalk';
 import shell from 'shelljs';
 import { program } from 'commander';
-import { cliName, nodePath, runtimePackageName } from './utils/config.js';
+import { cliName, corePackageName, nodePath } from './utils/config.js';
 import { getLastVersion } from './utils/get-pkg.js';
 
 let startStatus: boolean = false,
@@ -32,7 +32,7 @@ function start(execText?: string) {
 }
 const commonPath = path.resolve(
   process.cwd(),
-  `./node_modules/${runtimePackageName}/lib/config.js`
+  `./node_modules/${corePackageName}/lib/config.mjs`
 );
 function restart() {
   if (startStatus) return;
@@ -48,7 +48,7 @@ function restart() {
           shell.exec(`netstat -ano | grep :${DEVSERVERPORT}`, {
             silent: true,
           }).stdout || '';
-        const plist: string[] = [];
+        const posts: string[] = [];
 
         stdout.split('\n').forEach(function (line) {
           const p = line.trim().split(/\s+/);
@@ -58,9 +58,9 @@ function restart() {
             typeof p[1] !== 'undefined' &&
             (p[1].match(/([^:]+)$/) as string[])[1] == DEVSERVERPORT.toFixed()
           ) {
-            if (!plist.includes(p[4])) {
+            if (!posts.includes(p[4])) {
               process.kill(p[4] as unknown as number, 'SIGINT');
-              plist.push(p[4]);
+              posts.push(p[4]);
             }
           }
         });
@@ -102,7 +102,7 @@ program
     }
     const confPath = path.relative(
       process.cwd(),
-      `./node_modules/${runtimePackageName}/lib/dev.js`
+      `./node_modules/${corePackageName}/lib/dev.mjs`
     );
     const shellSrc = `${nodePath}npx cross-env NODE_ENV=development APPTYPE=${type} FRAMEWORK=${framework} ${args.join(
       ' '

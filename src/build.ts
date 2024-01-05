@@ -3,7 +3,7 @@ import { join, relative } from 'path';
 import chalk from 'chalk';
 import { program } from 'commander';
 import { lesscCommonjs } from './lessc.js';
-import { cliName, nodePath, runtimePackageName } from './utils/config.js';
+import { cliName, nodePath, corePackageName } from './utils/config.js';
 import { getLastVersion } from './utils/get-pkg.js';
 import { deleteEmptyDir, rmDirAsyncParalle } from './utils/rmdoc.js';
 
@@ -23,7 +23,7 @@ program
     const hasDocs = !args.includes('no-docs');
     const hasLib = !args.includes('no-lib');
     const hasEs = !args.includes('no-es');
-    const confPath = relative(process.cwd(), `./node_modules/${runtimePackageName}/lib/prod.js`);
+    const confPath = relative(process.cwd(), `./node_modules/${corePackageName}/lib/build.mjs`);
     const shellSrc = `${nodePath}npx cross-env NODE_ENV=production APPTYPE=${type} FRAMEWORK=${framework} ${args
       .filter((a: string) => !['no-docs', 'no-es', 'no-lib'].includes(a))
       .join(' ')} ${nodePath}node ${confPath}`;
