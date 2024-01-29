@@ -13,8 +13,8 @@ const totalBar = 24;
 export function progress(num: number = 0, title: string = '下载中: ', info: string = '') {
   const currBar = parseInt(((totalBar * num) / 100).toFixed());
   const bar =
-    chalk.bgBlueBright(new Array(currBar).fill('').join(' ')) +
-    chalk.bgGray(new Array(totalBar - currBar).fill('').join('⠂'));
+    chalk.bgBlueBright(Array.from({ length: currBar }, () => ' ').join('')) +
+    chalk.bgGray(Array.from({ length: totalBar - currBar }, () => '⠂').join(''));
 
   readline.cursorTo(process.stdout, 0);
   process.stdout.write(title + bar + ' ' + num + '% ' + chalk.grey(info));

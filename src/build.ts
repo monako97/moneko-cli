@@ -43,7 +43,7 @@ program
         spawn(`rm -rf ${dir}`, spawnOptions);
         // 编译 package
         const swc = spawn(
-          `${nodePath}npx swc components -d ${buildLib[i].dir} --config-file ${join(
+          `${nodePath}npx swc components -d ${buildLib[i].dir} --strip-leading-paths --config-file ${join(
             cwd,
             `./node_modules/${cliName}/conf/swc-${framework}`,
           )} -C jsc.experimental.cacheRoot=${process.cwd()}/node_modules/.swc -C module.type=${buildLib[i].type} --copy-files`,
