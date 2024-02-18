@@ -1,6 +1,6 @@
 {
   "name": "@moneko/cli",
-  "version": "2.8.0",
+  "version": "2.8.1",
   "description": "cli",
   "engines": {
     "node": ">=16.0.0"
@@ -17,10 +17,10 @@
     "mo": "./lib/index.js"
   },
   "dependencies": {
-    "@swc/cli": "0.3.5",
+    "@swc/cli": "0.3.9",
     "archiver": "6.0.1",
-    "commander": "11.1.0",
-    "inquirer": "9.2.13",
+    "commander": "12.0.0",
+    "inquirer": "9.2.14",
     "js-yaml": "4.1.0",
     "plist": "3.1.0",
     "shelljs": "0.8.5",
@@ -31,13 +31,13 @@
     "@types/archiver": "6.0.2",
     "@types/inquirer": "9.0.7",
     "@types/js-yaml": "4.0.9",
-    "@types/node": "20.11.10",
+    "@types/node": "20.11.19",
     "@types/plist": "3.0.5",
     "@types/shelljs": "0.8.15",
     "@types/xml2js": "0.4.14",
-    "swc-loader": "0.2.3",
+    "swc-loader": "0.2.6",
     "typescript": "5.3.3",
-    "webpack": "5.90.0",
+    "webpack": "5.90.2",
     "webpack-cli": "5.1.4"
   },
   "files": [
