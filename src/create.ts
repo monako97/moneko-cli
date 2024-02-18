@@ -9,6 +9,7 @@ import {
   commonPackageName,
   corePackageName,
   cssPackageName,
+  cwd,
   eslintPackageName,
   huskyPackageName,
   reactPackageName,
@@ -34,7 +35,7 @@ const genFiles = (options: {
   const templateName = `templet-${type}-${framework}`;
   const _destination = options.destination;
   // 项目指定生成目录，如果命令中没有有配置目录，则在当前命令运行的目录下生成以项目名称为名字的新目录
-  const destination = _destination ? path.resolve(_destination) : path.resolve(process.cwd(), name);
+  const destination = _destination ? path.resolve(_destination) : path.resolve(cwd, name);
 
   // 检查项目目录是否存在于当前目录中。
   if (!fs.existsSync(destination)) fs.mkdirSync(destination);

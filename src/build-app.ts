@@ -15,6 +15,7 @@ import {
   yamlToJson,
 } from './utils/txml.js';
 import { writeFile, readFileSync, __dirname, copyFolderRecursiveSync } from './file.js';
+import { cwd } from './utils/config.js';
 
 const createApp = async () => {
   interface InputQuestions extends InputQuestion {
@@ -71,7 +72,6 @@ const createApp = async () => {
     .then(async ({ bundleId, bundles }: { bundleId: string; bundles: string[] }) => {
       const domain = bundleId.split('.');
       const bundle_id = domain.splice(-1, 1).join('');
-      const cwd = process.cwd();
       const webAssetsEntry = path.join(cwd, '/dist');
 
       const sh = `flutter create -t app --org ${bundleId} -i swift -a kotlin ${bundle_id}`;

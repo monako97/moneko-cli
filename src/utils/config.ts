@@ -18,3 +18,5 @@ export const huskyPackageName = 'husky';
 export const cliName = cliPkgJson.name;
 export const cliVersion = cliPkgJson.version;
 export const cliAlias = Object.keys(cliPkgJson.bin)[0];
+export const cwd = process.cwd();
+export const cachePath = `${cwd}/node_modules/.cache`;

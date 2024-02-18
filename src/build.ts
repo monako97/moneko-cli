@@ -3,11 +3,10 @@ import { join, relative } from 'path';
 import chalk from 'chalk';
 import { program } from 'commander';
 import { lesscCommonjs } from './lessc.js';
-import { cliName, nodePath, corePackageName } from './utils/config.js';
+import { cliName, nodePath, corePackageName, cwd } from './utils/config.js';
 import { getLastVersion } from './utils/get-pkg.js';
 import { deleteEmptyDir, rmDirAsyncParalle } from './utils/rmdoc.js';
 
-const cwd = process.cwd();
 const spawnOptions: SpawnOptions = { stdio: 'inherit', shell: true };
 
 program
@@ -23,7 +22,7 @@ program
     const hasDocs = !args.includes('no-docs');
     const hasLib = !args.includes('no-lib');
     const hasEs = !args.includes('no-es');
-    const confPath = relative(process.cwd(), `./node_modules/${corePackageName}/lib/build.mjs`);
+    const confPath = relative(cwd, `./node_modules/${corePackageName}/lib/build.mjs`);
     const shellSrc = `${nodePath}npx cross-env NODE_ENV=production APPTYPE=${type} FRAMEWORK=${framework} ${args
       .filter((a: string) => !['no-docs', 'no-es', 'no-lib'].includes(a))
       .join(' ')} ${nodePath}node ${confPath}`;
@@ -46,7 +45,7 @@ program
           `${nodePath}npx swc components -d ${buildLib[i].dir} --strip-leading-paths --config-file ${join(
             cwd,
             `./node_modules/${cliName}/conf/swc-${framework}`,
-          )} -C jsc.experimental.cacheRoot=${process.cwd()}/node_modules/.swc -C module.type=${buildLib[i].type} --copy-files`,
+          )} -C jsc.experimental.cacheRoot=${cwd}/node_modules/.swc -C module.type=${buildLib[i].type} --copy-files`,
           spawnOptions,
         );
 

@@ -5,7 +5,7 @@ import child_process from 'child_process';
 import chalk from 'chalk';
 import shell from 'shelljs';
 import { program } from 'commander';
-import { cliName, corePackageName, nodePath } from './utils/config.js';
+import { cliName, corePackageName, cwd, nodePath } from './utils/config.js';
 import { getLastVersion } from './utils/get-pkg.js';
 
 let startStatus: boolean = false,
@@ -31,7 +31,7 @@ function start(execText?: string) {
   });
 }
 const commonPath = path.resolve(
-  process.cwd(),
+  cwd,
   `./node_modules/${corePackageName}/lib/config.mjs`
 );
 function restart() {
@@ -74,7 +74,7 @@ function restart() {
 }
 
 function watchCustomConfig() {
-  const configPath = path.resolve(process.cwd(), './config/index.ts');
+  const configPath = path.resolve(cwd, './config/index.ts');
 
   if (fs.existsSync(configPath)) {
     const w = fs.watch(configPath, (_, filename) => {
@@ -101,7 +101,7 @@ program
       args.splice(hasNoVerify, 1);
     }
     const confPath = path.relative(
-      process.cwd(),
+      cwd,
       `./node_modules/${corePackageName}/lib/dev.mjs`
     );
     const shellSrc = `${nodePath}npx cross-env NODE_ENV=development APPTYPE=${type} FRAMEWORK=${framework} ${args.join(

@@ -1,6 +1,6 @@
 import path from 'path';
 import { program } from 'commander';
-import { nodePath } from './utils/config.js';
+import { cachePath, cwd, nodePath } from './utils/config.js';
 import { runLint } from './runlint.js';
 
 program
@@ -13,7 +13,13 @@ program
   .option('--ext')
   .description('css代码规范检查')
   .action((soucre, _, cmd) => {
-    const shellSrc = `${nodePath}npx stylelint ${path.relative(process.cwd(), soucre)}/**/**/**/**/*.{less,css,scss,sass} ${cmd.parent.args.slice(2).join(' ')} --allow-empty-input`;
+    const exts = ['less', 'css', 'scss', 'sass', 'style.ts', 'style.js'];
+    const shellSrc = `${nodePath}npx stylelint ${path.relative(
+      cwd,
+      soucre
+    )}/**/**/**/**/*.{${exts.join(',')}} ${cmd.parent.args
+      .slice(2)
+      .join(' ')} --cache --cache-location "${cachePath}/.stylelintcache" --aei`;
 
     runLint(shellSrc, 'stylelint');
   });

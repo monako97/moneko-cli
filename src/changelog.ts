@@ -2,6 +2,7 @@ import { execSync } from 'child_process';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { program } from 'commander';
+import { cwd } from './utils/config.js';
 
 function getRemoteUrl() {
   return execSync('git config --get remote.origin.url | sed "s/\\.git$//"').toString().trim();
@@ -157,7 +158,7 @@ program
       text.push('\n当前分支尚无任何提交\n');
     }
 
-    writeFileSync(join(process.cwd(), filename), text.join('\n'), {
+    writeFileSync(join(cwd, filename), text.join('\n'), {
       encoding: 'utf-8',
     });
   });

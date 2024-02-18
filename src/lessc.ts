@@ -1,10 +1,9 @@
 import { extname, join, resolve } from 'path';
 import { readFile, writeFile, readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
-import { nodePath, corePackageName } from './utils/config.js';
+import { nodePath, corePackageName, cwd } from './utils/config.js';
 
 let modifyVarBash = '';
-const cwd = process.cwd();
 
 function lessc({ file, outputPath }: { file: string; outputPath: string }) {
   return new Promise((resolve, reject) => {

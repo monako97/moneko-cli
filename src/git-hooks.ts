@@ -10,9 +10,9 @@ program
       .map((h: string) => {
         const argv = h.split('=');
 
-        return `husky set ${installPath}/${argv[0]} "${argv[1]}"`;
+        return `echo "${argv[1]}" > ${installPath}/${argv[0]}`;
       })
       .join(' && ');
-    const shellSrc = `git init && husky install ${installPath} && ${huskySet}`;
+    const shellSrc = `git init && husky ${installPath} && ${huskySet}`;
     runLint(shellSrc, 'githooks', [null]);
   });
