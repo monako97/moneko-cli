@@ -22,13 +22,13 @@ jobs:
         with:
           path:  |
             node_modules
-            yarn.lock
+            pnpm-lock.lock
           key: node-modules-${{ hashFiles('package.json') }}
           restore-keys: node-modules-
       - name: 'install'
-        run: yarn
+        run: pnpm install
       - name: 'Bundle'
-        run: yarn build
+        run: pnpm run build
       - name: 'link'
         run: npm link
       - name: '验证'
