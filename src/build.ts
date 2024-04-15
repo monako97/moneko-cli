@@ -2,6 +2,7 @@ import { type SpawnOptions, spawn } from 'child_process';
 import { join, relative } from 'path';
 import chalk from 'chalk';
 import { program } from 'commander';
+import setupEnv from './utils/setup-env.js';
 import { lesscCommonjs } from './lessc.js';
 import { cliName, nodePath, corePackageName, cwd } from './utils/config.js';
 import { getLastVersion } from './utils/get-pkg.js';
@@ -17,14 +18,15 @@ program
       process.stdout.write(chalk.red(`type: 无效值 ${chalk.gray(type)}`));
       process.exit(1);
     }
+    setupEnv('production', type, framework);
     getLastVersion(cliName, null, true);
-    const args = cmd[1].args.slice(2);
+    const args: string[] = cmd[1].args.slice(2);
     const hasDocs = !args.includes('no-docs');
     const hasLib = !args.includes('no-lib');
     const hasEs = !args.includes('no-es');
     const confPath = relative(cwd, `./node_modules/${corePackageName}/lib/build.mjs`);
-    const shellSrc = `${nodePath}npx cross-env NODE_ENV=production APPTYPE=${type} FRAMEWORK=${framework} ${args
-      .filter((a: string) => !['no-docs', 'no-es', 'no-lib'].includes(a))
+    const shellSrc = `${nodePath}npx ${args
+      .filter((a) => !['no-docs', 'no-es', 'no-lib'].includes(a))
       .join(' ')} ${nodePath}node ${confPath}`;
 
     if (type === 'library') {
@@ -42,11 +44,15 @@ program
         spawn(`rm -rf ${dir}`, spawnOptions);
         // 编译 package
         const swc = spawn(
-          `${nodePath}npx swc components -d ${buildLib[i].dir} --strip-leading-paths --config-file ${join(
+          `${nodePath}npx swc components -d ${
+            buildLib[i].dir
+          } --strip-leading-paths --config-file ${join(
             cwd,
-            `./node_modules/${cliName}/conf/swc-${framework}`,
-          )} -C jsc.experimental.cacheRoot=${cwd}/node_modules/.swc -C module.type=${buildLib[i].type} --copy-files`,
-          spawnOptions,
+            `./node_modules/${cliName}/conf/swc-${framework}`
+          )} -C jsc.experimental.cacheRoot=${cwd}/node_modules/.swc -C module.type=${
+            buildLib[i].type
+          } --copy-files`,
+          spawnOptions
         );
 
         swc.on('close', function (code) {
@@ -63,9 +69,9 @@ program
         spawn(
           `${nodePath}npx tsc --project ${join(
             cwd,
-            `./node_modules/${cliName}/conf/pkg.json`,
+            `./node_modules/${cliName}/conf/pkg.json`
           )} --outDir ${buildLib[i].dir}`,
-          spawnOptions,
+          spawnOptions
         );
       }
     }

@@ -7,6 +7,7 @@ import shell from 'shelljs';
 import { program } from 'commander';
 import { cliName, corePackageName, cwd, nodePath } from './utils/config.js';
 import { getLastVersion } from './utils/get-pkg.js';
+import setupEnv from './utils/setup-env.js';
 
 let startStatus: boolean = false,
   _execText: string | undefined,
@@ -30,10 +31,7 @@ function start(execText?: string) {
     start();
   });
 }
-const commonPath = path.resolve(
-  cwd,
-  `./node_modules/${corePackageName}/lib/config.mjs`
-);
+const commonPath = path.resolve(cwd, `./node_modules/${corePackageName}/lib/config.mjs`);
 function restart() {
   if (startStatus) return;
   startStatus = true;
@@ -94,19 +92,15 @@ program
       process.stdout.write(chalk.red('type: 无效值 ' + chalk.gray(type)));
       process.exit(1);
     }
+    setupEnv('development', type, framework);
     getLastVersion(cliName, null, true);
-    const args = cmd[1].args.slice(2),
+    const args: string[] = cmd[1].args.slice(2),
       hasNoVerify = args.indexOf('no-verify');
     if (hasNoVerify !== -1) {
       args.splice(hasNoVerify, 1);
     }
-    const confPath = path.relative(
-      cwd,
-      `./node_modules/${corePackageName}/lib/dev.mjs`
-    );
-    const shellSrc = `${nodePath}npx cross-env NODE_ENV=development APPTYPE=${type} FRAMEWORK=${framework} ${args.join(
-      ' '
-    )} ${nodePath}node ${confPath}`;
+    const confPath = path.relative(cwd, `./node_modules/${corePackageName}/lib/dev.mjs`);
+    const shellSrc = `${nodePath}npx ${args.join(' ')} ${nodePath}node ${confPath}`;
 
     if (!watchConfig) {
       watchCustomConfig();

@@ -7,6 +7,7 @@ declare global {
         port: number;
       };
       modifyVars: Record<string, string>;
+      env: Record<string, string>;
     };
   }
 }
