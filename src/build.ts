@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { program } from 'commander';
 import setupEnv from './utils/setup-env.js';
 import { lesscCommonjs } from './lessc.js';
-import { cliName, nodePath, corePackageName, cwd } from './utils/config.js';
+import { cliName, nodePath, corePackageName, cwd, swcCachePath } from './utils/config.js';
 import { getLastVersion } from './utils/get-pkg.js';
 import { deleteEmptyDir, rmDirAsyncParalle } from './utils/rmdoc.js';
 
@@ -49,7 +49,7 @@ program
           } --strip-leading-paths --config-file ${join(
             cwd,
             `./node_modules/${cliName}/conf/swc-${framework}`
-          )} -C jsc.experimental.cacheRoot=${cwd}/node_modules/.swc -C module.type=${
+          )} -C jsc.experimental.cacheRoot=${swcCachePath} -C module.type=${
             buildLib[i].type
           } --copy-files`,
           spawnOptions
