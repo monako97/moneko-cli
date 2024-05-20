@@ -22,8 +22,6 @@ program
     const commonPath = join(cwd, `./node_modules/${corePackageName}/lib/config.mjs`);
 
     import(commonPath).then(() => {
-      const requireResolve = global.NEKOCLICONFIG.requireResolve;
-
       setupEnv('production', type, framework);
       getLastVersion(cliName, null, true);
       const args: string[] = cmd[1].args.slice(2);
@@ -44,7 +42,6 @@ program
           type: string;
           dir: string;
         }[];
-        const tsc = join(requireResolve('typescript'), '../../bin/tsc');
 
         for (let i = 0, len = buildLib.length; i < len; i++) {
           const dir = join(cwd, `./${buildLib[i].dir}`);
@@ -68,7 +65,7 @@ program
           });
           // 编译类型文件
           spawn(
-            `${nodePath}npx ${tsc} --project ${join(
+            `${nodePath}npx tsc --project ${join(
               cwd,
               `./node_modules/${cliName}/conf/pkg.json`
             )} --outDir ${buildLib[i].dir}`,
@@ -76,12 +73,12 @@ program
           );
         }
       }
-      // if (type !== 'library' || (hasDocs && type === 'library')) {
-      //   const build = spawn(shellSrc, spawnOptions);
+      if (type !== 'library' || (hasDocs && type === 'library')) {
+        const build = spawn(shellSrc, spawnOptions);
 
-      //   build.on('close', async function () {
-      //     process.exit(0);
-      //   });
-      // }
+        build.on('close', async function () {
+          process.exit(0);
+        });
+      }
     });
   });
