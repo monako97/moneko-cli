@@ -39,7 +39,7 @@ function restart() {
   readline.cursorTo(process.stdout, 0);
   process.stdout.write(chalk.yellow('配置已更新, 正在重新部署...\n'));
   if (child) {
-    import(commonPath).then((v) => {
+    import(commonPath).then(() => {
       DEVSERVERPORT = global.NEKOCLICONFIG.CONFIG.devServer.port;
       if (process.platform === 'win32') {
         const stdout =

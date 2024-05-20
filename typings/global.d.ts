@@ -9,6 +9,7 @@ declare global {
       modifyVars: Record<string, string>;
       env: Record<string, string>;
     };
+    requireResolve(name: string): string;
   }
 }
 
