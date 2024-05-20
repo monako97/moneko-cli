@@ -2,12 +2,14 @@ import { extname, join, resolve } from 'path';
 import { readFile, writeFile, readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
 import { nodePath, corePackageName, cwd } from './utils/config.js';
+import { resolve as requireResolve } from './utils/require-reslove.cjs';
 
 let modifyVarBash = '';
+const lesscBin = join(requireResolve('less'), '../bin/lessc');
 
 function lessc({ file, outputPath }: { file: string; outputPath: string }) {
   return new Promise((resolve, reject) => {
-    exec(`${nodePath}npx lessc --js ${modifyVarBash} ${file} > ${outputPath}`, function (error) {
+    exec(`${nodePath}npx ${lesscBin} --js ${modifyVarBash} ${file} > ${outputPath}`, function (error) {
       if (error) return reject(error);
       resolve(true);
     });

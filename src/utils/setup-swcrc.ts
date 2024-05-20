@@ -1,13 +1,13 @@
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { __dirname } from '../file.js';
+import { resolve } from './require-reslove.cjs';
 
 const swcrcPath = join(__dirname, `.swcrc`);
 
 function setupSwcRc(framework: 'react' | 'solid') {
   const isSolid = framework === 'solid';
   const isReact = framework === 'react';
-  const requireResolve = global.NEKOCLICONFIG.requireResolve;
 
   const swcrc = {
     $schema: 'https://json.schemastore.org/swcrc',
@@ -47,7 +47,7 @@ function setupSwcRc(framework: 'react' | 'solid') {
       experimental: {
         plugins: [
           [
-            requireResolve('@moneko/transform-imports'),
+            resolve('@moneko/transform-imports'),
             {
               '@moneko/common': {
                 transform: '@moneko/common/lib/${member}',
@@ -58,7 +58,7 @@ function setupSwcRc(framework: 'react' | 'solid') {
             },
           ],
           isSolid && [
-            requireResolve('@moneko/jsx-dom-expressions'),
+            resolve('@moneko/jsx-dom-expressions'),
             {
               moduleName: 'solid-js/web',
               builtIns: [
