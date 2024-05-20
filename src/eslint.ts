@@ -2,7 +2,7 @@ import { join, relative } from 'path';
 import { program } from 'commander';
 import { runLint } from './runlint.js';
 import { cachePath, cwd, nodePath } from './utils/config.js';
-import { resolve } from './utils/require-reslove.cjs';
+import require from './utils/require-reslove.js';
 
 program
   .command('eslint <soucre>')
@@ -14,7 +14,7 @@ program
   .option('--ext')
   .description('js代码规范检查')
   .action((soucre, _, cmd) => {
-    const eslint = join(resolve('eslint'), '../../bin/eslint.js');
+    const eslint = join(require.resolve('eslint'), '../../bin/eslint.js');
     const shellSrc = `${nodePath}npx ${eslint} ${relative(
       cwd,
       soucre

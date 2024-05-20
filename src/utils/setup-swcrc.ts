@@ -1,7 +1,7 @@
 import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { __dirname } from '../file.js';
-import { resolve } from './require-reslove.cjs';
+import require from './require-reslove.js';
 
 const swcrcPath = join(__dirname, `.swcrc`);
 
@@ -47,7 +47,7 @@ function setupSwcRc(framework: 'react' | 'solid') {
       experimental: {
         plugins: [
           [
-            resolve('@moneko/transform-imports'),
+            require.resolve('@moneko/transform-imports'),
             {
               '@moneko/common': {
                 transform: '@moneko/common/lib/${member}',
@@ -58,7 +58,7 @@ function setupSwcRc(framework: 'react' | 'solid') {
             },
           ],
           isSolid && [
-            resolve('@moneko/jsx-dom-expressions'),
+            require.resolve('@moneko/jsx-dom-expressions'),
             {
               moduleName: 'solid-js/web',
               builtIns: [

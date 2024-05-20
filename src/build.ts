@@ -8,7 +8,7 @@ import { cliName, nodePath, corePackageName, cwd, swcCachePath } from './utils/c
 import { getLastVersion } from './utils/get-pkg.js';
 import { deleteEmptyDir, rmDirAsyncParalle } from './utils/rmdoc.js';
 import setupSwcRc from './utils/setup-swcrc.js';
-import { resolve } from './utils/require-reslove.cjs';
+import require from './utils/require-reslove.js';
 
 const spawnOptions: SpawnOptions = { stdio: 'inherit', shell: true };
 
@@ -33,8 +33,8 @@ program
 
     if (type === 'library') {
       const swcrc = setupSwcRc(framework);
-      const tsc = join(resolve('typescript'), '../../bin/tsc');
-      const swc = join(resolve('@swc/cli'), '../../../bin/swc.js');
+      const tsc = join(require.resolve('typescript'), '../../bin/tsc');
+      const swc = join(require.resolve('@swc/cli'), '../../../bin/swc.js');
       const buildLib = [
         hasLib && { type: 'commonjs', dir: 'lib' },
         hasEs && { type: 'es6 -C jsc.target=es2015', dir: 'es' },
