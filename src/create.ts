@@ -55,9 +55,6 @@ const genFiles = (options: {
   ];
   const dependencies: string[] = [];
 
-  if (isLibrary && hasEslint) {
-    pkgJsonFetch.push('eslint-plugin-mdx');
-  }
   switch (framework) {
     case 'react':
       dependencies.push('react', 'react-dom', reactPackageName);
@@ -206,6 +203,8 @@ const genFiles = (options: {
           '      - \\?raw$',
           '      - ^@/',
           '      - ^@app',
+          '      - ^@moneko/common',
+          '      - ^@moneko/css',
           isLibrary && '      - ^@pkg',
           isLibrary && '      - ^libraryNameTemplate',
         ].filter(Boolean);
