@@ -1,38 +1,32 @@
 import { extname, join, resolve } from 'path';
-import { readFile, writeFile, readdirSync, statSync } from 'fs';
+import { readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
 import { nodePath, corePackageName, cwd } from './utils/config.js';
-import require from './utils/require-reslove.js';
+import require from './utils/require.js';
+import { loadFile, saveFile } from '@moneko/utils';
 
 let modifyVarBash = '';
-const lesscBin = join(require.resolve('less'), '../bin/lessc');
 
 function lessc({ file, outputPath }: { file: string; outputPath: string }) {
+  const lesscBin = join(require.resolve('less'), '../bin/lessc');
+  
   return new Promise((resolve, reject) => {
-    exec(`${nodePath}npx ${lesscBin} --js ${modifyVarBash} ${file} > ${outputPath}`, function (error) {
-      if (error) return reject(error);
-      resolve(true);
-    });
+    exec(
+      `${nodePath}npx ${lesscBin} --js ${modifyVarBash} ${file} > ${outputPath}`,
+      function (error) {
+        if (error) return reject(error);
+        resolve(true);
+      }
+    );
   });
 }
 
-function lesscFile(filepath: string) {
-  return new Promise((resolve, reject) => {
-    readFile(filepath, { encoding: 'utf-8' }, function (error, data) {
-      if (error) return reject(error);
-      else if (/\*?\.less/g.test(data)) {
-        writeFile(
-          filepath,
-          data.replace(/\*?\.less/g, '.css'),
-          { encoding: 'utf-8' },
-          function (err) {
-            if (err) reject(err);
-            else resolve(true);
-          }
-        );
-      }
-    });
-  });
+async function lesscFile(filepath: string) {
+  const data = await loadFile(filepath);
+
+  if (data && /\*?\.less/g.test(data)) {
+    await saveFile(filepath, data.replace(/\*?\.less/g, '.css'));
+  }
 }
 let lessFiles: { file: string; outputPath: string }[] = [];
 
@@ -75,7 +69,7 @@ export async function lesscCommonjs() {
 
   if (arr && arr.length) {
     const modifyVars = (
-      await import(resolve(cwd, `./node_modules/${corePackageName}/lib/options/modify-vars.mjs`))
+      await import(require.resolve(`${corePackageName}/lib/options/modify-vars.mjs`))
     ).default;
 
     for (const k in modifyVars) {

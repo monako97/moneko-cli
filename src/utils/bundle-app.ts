@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs';
+import { readdirSync, createWriteStream } from 'fs';
 import readline from 'readline';
 import shelljs from 'shelljs';
 import archiver from 'archiver';
@@ -34,10 +34,10 @@ export function bundleIpa(outputPath: string, outputBundleDir: string, type = '-
 
   shelljs.cd(bundleDir);
 
-  const dirList = fs.readdirSync(bundleDir);
+  const dirList = readdirSync(bundleDir);
 
   dirList.forEach(function (item) {
-    const output = fs.createWriteStream(path.join(outputBundleDir, `app${type}.ipa`));
+    const output = createWriteStream(path.join(outputBundleDir, `app${type}.ipa`));
     const archive = archiver('zip', {
       zlib: { level: 9 }
     });

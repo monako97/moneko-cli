@@ -1,5 +1,0 @@
-{
-  "extends": "../../../../tsconfig.json",
-  "include": ["../../../../components", "../../../../typings"],
-  "exclude": ["../../../../components/**/examples/*", "../../../../components/**/__tests__/*", "../../../../components/**/__mocks__/*"]
-}

@@ -1,24 +1,11 @@
-import fs from 'fs';
+import { loadFileSync, saveFileSync } from '@moneko/utils';
+import { statSync, readdirSync } from 'fs';
 import path from 'path';
-import shell from 'shelljs';
 import url from 'url';
 
 export const __filename = url.fileURLToPath(import.meta.url);
 
 export const __dirname = path.dirname(__filename);
-
-export const writeFile = (filePath: string, value: Buffer | string) => {
-  if (!fs.existsSync(path.dirname(filePath))) {
-    shell.mkdir('-p', path.dirname(filePath).replace(/\\$/g, '\\$'));
-  }
-  fs.writeFile(filePath, value, 'utf-8', (err) => {
-    if (err) {
-      throw err;
-    };
-  });
-};
-
-export const readFileSync = (filePath: string) => fs.readFileSync(filePath, { encoding: 'utf-8' });
 
 /**
  * 拷贝文件
@@ -27,15 +14,16 @@ export const readFileSync = (filePath: string) => fs.readFileSync(filePath, { en
  * @constructor
  * */
 export function copyFileSync(source: string, target: string) {
-  let targetFile = target;
+  const data = loadFileSync(source);
 
-  if (fs.existsSync(target)) {
-    if (fs.statSync(target).isDirectory()) {
+  if (data !== null) {
+    let targetFile = target;
+
+    if (statSync(target).isDirectory()) {
       targetFile = path.join(target, path.basename(source));
     }
+    saveFileSync(targetFile, data);
   }
-
-  fs.writeFileSync(targetFile, fs.readFileSync(source));
 }
 
 /**
@@ -53,19 +41,13 @@ export function copyFolderRecursiveSync(source: string, target: string, sun?: bo
   if (sun) {
     targetFolder = path.join(target, path.basename(source));
   }
-
-  if (!fs.existsSync(targetFolder)) {
-    fs.mkdirSync(targetFolder);
-  }
-
   // Copy
-  if (fs.statSync(source).isDirectory()) {
-    files = fs.readdirSync(source);
+  if (statSync(source).isDirectory()) {
+    files = readdirSync(source);
     files.forEach(function (file) {
       let curSource = path.join(source, file);
 
-      if (fs.statSync(curSource).isDirectory()) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      if (statSync(curSource).isDirectory()) {
         copyFolderRecursiveSync(curSource, targetFolder, true);
       } else {
         copyFileSync(curSource, targetFolder);

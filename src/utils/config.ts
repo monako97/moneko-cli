@@ -1,9 +1,11 @@
 import path from 'path';
-import { readFileSync, __dirname } from '../file.js';
+import { __dirname } from '../file.js';
+import require from './require.js';
+
 const nodeDir = path.join(path.dirname(process.execPath).replace(/(\s+)/g, '\\$1'), '/');
 const anthor = 'moneko';
 export const nodePath = process.platform === 'win32' ? '' : nodeDir;
-export const cliPkgJson = JSON.parse(readFileSync(path.join(__dirname, '../package.json')));
+export const cliPkgJson = require(path.join(__dirname, '../package.json'));
 export const corePackageName = `@${anthor}/core`;
 export const commonPackageName = `@${anthor}/common`;
 export const requestPackageName = `@${anthor}/request`;

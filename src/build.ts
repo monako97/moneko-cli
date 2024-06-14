@@ -6,9 +6,11 @@ import setupEnv from './utils/setup-env.js';
 import { lesscCommonjs } from './lessc.js';
 import { cliName, nodePath, corePackageName, cwd, swcCachePath } from './utils/config.js';
 import { getLastVersion } from './utils/get-pkg.js';
-import { deleteEmptyDir, rmDirAsyncParalle } from './utils/rmdoc.js';
+import { rmDirAsyncParalle } from './utils/rmdoc.js';
 import setupSwcRc from './utils/setup-swcrc.js';
-import require from './utils/require-reslove.js';
+import require from './utils/require.js';
+import { __dirname } from './file.js';
+import { deleteEmptyDirs, updateFileSync } from '@moneko/utils';
 
 const spawnOptions: SpawnOptions = { stdio: 'inherit', shell: true };
 
@@ -26,15 +28,15 @@ program
     const hasDocs = !args.includes('no-docs');
     const hasLib = !args.includes('no-lib');
     const hasEs = !args.includes('no-es');
-    const confPath = relative(cwd, `./node_modules/${corePackageName}/lib/build.mjs`);
     const shellSrc = `${nodePath}npx ${args
       .filter((a) => !['no-docs', 'no-es', 'no-lib'].includes(a))
-      .join(' ')} ${nodePath}node ${confPath}`;
+      .join(' ')} ${nodePath}node ${require.resolve(`${corePackageName}/lib/build.mjs`)}`;
 
     if (type === 'library') {
       const swcrc = setupSwcRc(framework);
-      const tsc = join(require.resolve('typescript'), '../../bin/tsc');
-      const swc = join(require.resolve('@swc/cli'), '../../../bin/swc.js');
+      const tsc = require.resolve('typescript/bin/tsc');
+      const swc = require.resolve('@swc/cli/bin/swc.js');
+
       const buildLib = [
         hasLib && { type: 'commonjs', dir: 'lib' },
         hasEs && { type: 'es6 -C jsc.target=es2015', dir: 'es' },
@@ -57,20 +59,34 @@ program
           if (code === 0) {
             // 去除 package 中的文档文件
             rmDirAsyncParalle(dir, () => {});
-            deleteEmptyDir(dir);
+            deleteEmptyDirs(dir);
             if (buildLib[i].type === 'commonjs') {
               lesscCommonjs();
             }
           }
         });
-        // 编译类型文件
-        spawn(
-          `${nodePath}npx ${tsc} --project ${join(
-            cwd,
-            `./node_modules/${cliName}/conf/pkg.json`
-          )} --outDir ${buildLib[i].dir}`,
-          spawnOptions
+      }
+      if (buildLib.length) {
+        const pkgPath = join(__dirname, '.types.json');
+
+        updateFileSync(
+          pkgPath,
+          JSON.stringify({
+            extends: relative(__dirname, join(cwd, 'tsconfig.json')),
+            include: [
+              relative(__dirname, join(cwd, 'components')),
+              relative(__dirname, join(cwd, 'typings')),
+            ],
+            exclude: [
+              relative(__dirname, join(cwd, 'components/**/examples/*')),
+              relative(__dirname, join(cwd, 'components/**/__tests__/*')),
+              relative(__dirname, join(cwd, 'components/**/__mocks__/*')),
+            ],
+          })
         );
+        spawn(`rm -rf ./types`, spawnOptions);
+        // 编译类型文件
+        spawn(`${nodePath}npx ${tsc} --project ${pkgPath} --outDir types`, spawnOptions);
       }
     }
     if (type !== 'library' || (hasDocs && type === 'library')) {

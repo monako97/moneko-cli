@@ -1,15 +1,13 @@
-import { writeFileSync } from 'fs';
 import { join, relative } from 'path';
 import { cwd } from './config.js';
 import { config } from 'dotenv';
 import { __dirname } from '../file.js';
+import { updateFileSync } from '@moneko/utils';
 
 function setupEnv(mode: string, type: string, framework: string) {
   const envPath = join(__dirname, `.${mode}.env`);
 
-  writeFileSync(envPath, `NODE_ENV=${mode}\nAPPTYPE=${type}\nFRAMEWORK=${framework}`, {
-    encoding: 'utf-8',
-  });
+  updateFileSync(envPath, `NODE_ENV=${mode}\nAPPTYPE=${type}\nFRAMEWORK=${framework}`);
   const envs = [
     envPath,
     relative(cwd, '.env'),

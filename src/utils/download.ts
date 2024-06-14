@@ -1,13 +1,22 @@
 import https from 'https';
 import http from 'http';
 import zlib from 'zlib';
-import fs from 'fs';
+import { createWriteStream, unlink } from 'fs';
 import { isFunc } from './get-pkg.js';
 
 global.templates = {};
 
 // 文件下载
-export const downloadFile = (url: string, dest = null, cb: (status?: 'error' | 'data' | 'finish:data' | 'finish:file' | number, message?: string, currProgress?: string, total?: string) => void) => {
+export const downloadFile = (
+  url: string,
+  dest = null,
+  cb: (
+    status?: 'error' | 'data' | 'finish:data' | 'finish:file' | number,
+    message?: string,
+    currProgress?: string,
+    total?: string
+  ) => void
+) => {
   const fetch = url.startsWith('https:') ? https : http;
 
   fetch.get(url, (res) => {
@@ -50,7 +59,7 @@ export const downloadFile = (url: string, dest = null, cb: (status?: 'error' | '
     // 下载到本地
     // 确保路径存在
     if (dest) {
-      const file = fs.createWriteStream(dest);
+      const file = createWriteStream(dest);
       // 超时,结束等
 
       file
@@ -58,12 +67,12 @@ export const downloadFile = (url: string, dest = null, cb: (status?: 'error' | '
           // 文件写入完成
           return file.close((err) => {
             if (!err) {
-              isFunc(cb) && cb('finish:file')
+              isFunc(cb) && cb('finish:file');
             }
           });
         })
         .on('error', (err) => {
-          fs.unlink(dest, () => {});
+          unlink(dest, () => {});
           return isFunc(cb) && cb('error', err.message);
         });
 

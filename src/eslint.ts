@@ -2,7 +2,7 @@ import { join, relative } from 'path';
 import { program } from 'commander';
 import { runLint } from './runlint.js';
 import { cachePath, cwd, nodePath } from './utils/config.js';
-import require from './utils/require-reslove.js';
+import require from './utils/require.js';
 
 program
   .command('eslint <soucre>')

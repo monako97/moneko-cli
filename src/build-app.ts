@@ -14,8 +14,9 @@ import {
   xmlToJson,
   yamlToJson,
 } from './utils/txml.js';
-import { writeFile, readFileSync, __dirname, copyFolderRecursiveSync } from './file.js';
+import { __dirname, copyFolderRecursiveSync } from './file.js';
 import { cwd } from './utils/config.js';
+import { loadFileSync, saveFile } from '@moneko/utils';
 
 const createApp = async () => {
   interface InputQuestions extends InputQuestion {
@@ -91,7 +92,7 @@ const createApp = async () => {
       // pub 依赖
       const pubObjPath = path.join(outputPath, 'pubspec.yaml');
       const pubObj: Record<string, Record<string, string | string[]>> = yamlToJson(
-        readFileSync(pubObjPath)
+        loadFileSync(pubObjPath) || ''
       ) as Record<string, Record<string, string | string[]>>;
       // 自动分析注册资产
       const allAssetsDirs: string[] = [];
@@ -117,7 +118,7 @@ const createApp = async () => {
 
       pubObj.dependencies.webview_flutter_plus = '^0.2.3';
       pubObj.flutter.assets = ['assets/web/', ...allAssetsDirs];
-      writeFile(pubObjPath, jsonToYaml(pubObj));
+      saveFile(pubObjPath, jsonToYaml(pubObj));
 
       readline.cursorTo(process.stdout, 0);
       process.stdout.write(chalk.cyan('注册资产') + ': ' + chalk.green('完成\n'));
@@ -148,20 +149,20 @@ const createApp = async () => {
           outputPath,
           'android/app/src/main/AndroidManifest.xml'
         );
-        const androidMainXmlJson = await xmlToJson(readFileSync(androidMainXmlPath));
+        const androidMainXmlJson = await xmlToJson(loadFileSync(androidMainXmlPath) || '');
 
         androidMainXmlJson.manifest.application.$['android:usesCleartextTraffic'] = 'true';
         androidMainXmlJson.manifest['uses-permission'] = androidUsesPermissions;
 
         const androidMainXml = jsonToXml(androidMainXmlJson);
 
-        writeFile(androidMainXmlPath, androidMainXml);
+        saveFile(androidMainXmlPath, androidMainXml);
         // 修改 安卓build.gradle
         const androidBuildGradlePath = path.join(outputPath, 'android/app/build.gradle');
-        let androidBuildGradle = readFileSync(androidBuildGradlePath);
+        let androidBuildGradle = loadFileSync(androidBuildGradlePath) || '';
         const minSdkVersion = 'minSdkVersion flutter.minSdkVersion';
 
-        if (androidBuildGradle.includes(minSdkVersion)) {
+        if (androidBuildGradle?.includes(minSdkVersion)) {
           androidBuildGradle = androidBuildGradle.replace(minSdkVersion, 'minSdkVersion 20');
         } else {
           const minSdkVersionIndex = androidBuildGradle.indexOf('minSdkVersion ');
@@ -174,7 +175,7 @@ const createApp = async () => {
             androidBuildGradle = androidBuildGradle.replace(compileSdkVersion, 'compileSdkVersion 32');
         }
         
-        writeFile(androidBuildGradlePath, androidBuildGradle);
+        saveFile(androidBuildGradlePath, androidBuildGradle);
         readline.cursorTo(process.stdout, 0);
         process.stdout.write(chalk.cyan('安卓权限配置') + ': ' + chalk.green('完成 \n'));
       }
@@ -183,7 +184,7 @@ const createApp = async () => {
         process.stdout.write(chalk.yellow('开始配置IOS权限'));
         // ios 配置文件
         const iosPlistPath = path.join(outputPath, 'ios/Runner/Info.plist');
-        const iosPlist = readFileSync(iosPlistPath);
+        const iosPlist = loadFileSync(iosPlistPath) || '';
         const plistJson = Object.assign(plistToJson(iosPlist), {
           NSAppTransportSecurity: {
             NSAllowsArbitraryLoads: true,
@@ -191,14 +192,14 @@ const createApp = async () => {
           ['io.flutter.embedded_views_preview']: true,
         });
 
-        writeFile(iosPlistPath, jsonToPlist(plistJson));
+        saveFile(iosPlistPath, jsonToPlist(plistJson));
         readline.cursorTo(process.stdout, 0);
         process.stdout.write(chalk.cyan('IOS权限配置') + ': ' + chalk.green('完成\n'));
       }
       // 主程序
-      writeFile(
+      saveFile(
         path.join(outputPath, 'lib/main.dart'),
-        readFileSync(path.join(__dirname, '../conf/bootstrap'))
+        loadFileSync(path.join(__dirname, '../conf/bootstrap')) || ''
       );
 
       const outputBundleDir = path.join(cwd, './bundle/');

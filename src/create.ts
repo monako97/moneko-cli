@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { program } from 'commander';
 import inquirer from 'inquirer';
-import { __dirname, readFileSync, writeFile } from './file.js';
+import { __dirname } from './file.js';
 import {
   cliAlias,
   cliName,
@@ -20,6 +20,7 @@ import {
 } from './utils/config.js';
 import { getLastVersion, objectSort } from './utils/get-pkg.js';
 import { fetchTemplate } from './utils/template.js';
+import { loadFileSync, saveFile } from '@moneko/utils';
 
 type Framework = 'react' | 'vue' | 'solid';
 const genFiles = (options: {
@@ -45,7 +46,7 @@ const genFiles = (options: {
     hasHusky = tools.includes(huskyPackageName),
     hasCommitlint = tools.includes('commitlint'),
     packagePath = `${destination}/package.json`,
-    ignoreConfig = JSON.parse(readFileSync(path.join(__dirname, '../conf/ignore.json')));
+    ignoreConfig = JSON.parse(loadFileSync(path.join(__dirname, '../conf/ignore.json')) || '{}');
   const pkgJsonFetch = [
     cliName,
     corePackageName,
@@ -108,7 +109,7 @@ const genFiles = (options: {
           .replace(/PackageNameBySolid/g, solidJsPackageName)
           .replace(/PackageNameByVue/g, vuePackageName)
           .replace(/libraryNameTemplate/g, name);
-        writeFile(path.join(destination, filename), global.templates[key]);
+        saveFile(path.join(destination, filename), global.templates[key]);
       }
     }
 
@@ -117,9 +118,9 @@ const genFiles = (options: {
     if (!pkgJson.dependencies) {
       pkgJson.dependencies = {};
     }
-    writeFile(
+    saveFile(
       `${destination}/README.md`,
-      readFileSync(path.join(__dirname, '../conf/README.md'))
+      loadFileSync(path.join(__dirname, '../conf/README.md'))!
         .replace(/libraryNameTemplate/g, name)
         .replace(/libraryDescriptionTemplate/g, pkgJson.description)
     );
@@ -128,17 +129,27 @@ const genFiles = (options: {
     pkgJson.scripts.start = `${cliAlias} start ${type} ${framework}`;
     pkgJson.scripts.build = `${cliAlias} build ${type} ${framework}`;
     pkgJson.version = '1.0.0';
+    pkgJson.main = 'lib/index.js';
+    pkgJson.module = 'es/index.js';
+    pkgJson.types = 'types/index.d.ts';
+    pkgJson.exports = {
+      '.': {
+        require: './lib/index.js',
+        import: './es/index.js',
+      },
+      './*': ['./*'],
+    };
     pkgJson.files = undefined;
     const lints = [
-      hasStylelint && 'yarn stylelint',
-      hasEslint && 'yarn eslint',
-      hasChangelog && 'yarn changelog',
+      hasStylelint && 'npm run stylelint',
+      hasEslint && 'npm run eslint',
+      hasChangelog && 'npm run changelog',
     ].filter(Boolean);
     let lintDir = ['src'];
 
     if (isLibrary) {
       lintDir = ['components', 'site'];
-      pkgJson.files = ['LICENSE', 'README.md', 'es', 'lib'];
+      pkgJson.files = ['LICENSE', 'README.md', 'es', 'lib', 'types'];
     }
 
     if (hasStylelint) {
@@ -203,18 +214,18 @@ const genFiles = (options: {
 
       if (ignore.includes('prettier') || ignore.includes('eslint')) {
         if (hasEslint) {
-          writeFile(ignoreSrc, ignoreVal);
+          saveFile(ignoreSrc, ignoreVal);
         }
       } else if (ignore.includes('stylelint')) {
         if (hasStylelint) {
-          writeFile(ignoreSrc, ignoreVal);
+          saveFile(ignoreSrc, ignoreVal);
         }
       } else if (ignore.includes('commitlintrc')) {
         if (hasHusky) {
-          writeFile(ignoreSrc, ignoreVal);
+          saveFile(ignoreSrc, ignoreVal);
         }
       } else {
-        writeFile(ignoreSrc, ignoreVal);
+        saveFile(ignoreSrc, ignoreVal);
       }
     });
 
@@ -223,7 +234,7 @@ const genFiles = (options: {
         clearInterval(timer);
         pkgJson.dependencies = objectSort(pkgJson.dependencies);
         pkgJson.devDependencies = objectSort(pkgJson.devDependencies);
-        writeFile(packagePath, JSON.stringify(pkgJson, null, 4));
+        saveFile(packagePath, JSON.stringify(pkgJson, null, 4));
       }
     }, 500);
   });

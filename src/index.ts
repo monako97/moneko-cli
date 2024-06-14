@@ -21,6 +21,6 @@ program.parse(process.argv);
 // 'SIGTERM' 在 Windows 中不支持，可以给其绑定监听器
 ['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) =>
   process.on(signal, () => {
-    process.exit(1);
+    process.exit(0);
   })
 );
