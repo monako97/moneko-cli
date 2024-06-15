@@ -126,16 +126,7 @@ const genFiles = (options: {
     pkgJson.scripts.start = `${cliAlias} start ${type} ${framework}`;
     pkgJson.scripts.build = `${cliAlias} build ${type} ${framework}`;
     pkgJson.version = '1.0.0';
-    pkgJson.main = 'lib/index.js';
-    pkgJson.module = 'es/index.js';
-    pkgJson.types = 'types/index.d.ts';
-    pkgJson.exports = {
-      '.': {
-        require: './lib/index.js',
-        import: './es/index.js',
-      },
-      './*': ['./*'],
-    };
+    pkgJson.main = 'index.js';
     pkgJson.files = undefined;
     const lints = [
       hasStylelint && 'npm run stylelint',
@@ -147,6 +138,16 @@ const genFiles = (options: {
     if (isLibrary) {
       lintDir = ['components', 'site'];
       pkgJson.files = ['LICENSE', 'README.md', 'es', 'lib', 'types'];
+      pkgJson.main = 'lib/index.js';
+      pkgJson.module = 'es/index.js';
+      pkgJson.types = 'types/index.d.ts';
+      pkgJson.exports = {
+        '.': {
+          require: './lib/index.js',
+          import: './es/index.js',
+        },
+        './*': ['./*'],
+      };
     }
 
     if (hasStylelint) {
