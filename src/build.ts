@@ -84,18 +84,11 @@ program
           })
         );
         removeDir('./types');
-        const msg = chalk.cyan('Generate DTS');
-
-        console.time(msg);
         // 编译类型文件
-        const dts = spawn(
+        spawn(
           `${nodePath}npx ${tsc} --project ${pkgPath} --outDir types`,
           spawnOptions
         );
-
-        dts.on('close', () => {
-          console.timeEnd(msg);
-        });
       }
     }
     if (type !== 'library' || (hasDocs && type === 'library')) {

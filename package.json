@@ -1,6 +1,6 @@
 {
   "name": "@moneko/cli",
-  "version": "2.14.8",
+  "version": "2.14.10",
   "description": "cli",
   "engines": {
     "node": ">=16.0.0"
@@ -16,7 +16,7 @@
     "mo": "./lib/index.js"
   },
   "dependencies": {
-    "@moneko/utils": "0.1.11",
+    "@moneko/utils": "0.1.12",
     "@swc/cli": "0.4.0",
     "archiver": "7.0.1",
     "chalk": "5.3.0",
