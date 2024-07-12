@@ -1,8 +1,7 @@
 import { spawn } from 'child_process';
 import chalk from 'chalk';
 import { program } from 'commander';
-import { cliName, corePackageName, nodePath } from './utils/config.js';
-import { getLastVersion } from './utils/get-pkg.js';
+import { corePackageName, nodePath } from './utils/config.js';
 import setupEnv from './utils/setup-env.js';
 import require from './utils/require.js';
 
@@ -15,7 +14,6 @@ program
       process.exit(1);
     }
     setupEnv('development', type, framework);
-    getLastVersion(cliName, null, true);
     const args: string[] = cmd[1].args.slice(2),
       hasNoVerify = args.indexOf('no-verify');
     if (hasNoVerify !== -1) {

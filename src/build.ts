@@ -4,13 +4,12 @@ import chalk from 'chalk';
 import { program } from 'commander';
 import setupEnv from './utils/setup-env.js';
 import { lesscCommonjs } from './lessc.js';
-import { cliName, nodePath, corePackageName, cwd, swcCachePath } from './utils/config.js';
-import { getLastVersion } from './utils/get-pkg.js';
+import { nodePath, corePackageName, cwd, swcCachePath } from './utils/config.js';
 import { rmDirAsyncParalle } from './utils/rmdoc.js';
 import setupSwcRc from './utils/setup-swcrc.js';
 import require from './utils/require.js';
 import { __dirname } from './file.js';
-import { deleteEmptyDirs, updateFileSync } from '@moneko/utils';
+import { deleteEmptyDirs, updateFileSync, removeDir } from '@moneko/utils';
 
 const spawnOptions: SpawnOptions = { stdio: 'inherit', shell: true };
 
@@ -23,11 +22,10 @@ program
       process.exit(1);
     }
     setupEnv('production', type, framework);
-    getLastVersion(cliName, null, true);
     const args: string[] = cmd[1].args.slice(2);
-    const hasDocs = !args.includes('no-docs');
-    const hasLib = !args.includes('no-lib');
-    const hasEs = !args.includes('no-es');
+    const hasDocs = !args.includes('no-docs'),
+      hasLib = !args.includes('no-lib'),
+      hasEs = !args.includes('no-es');
     const shellSrc = `${nodePath}npx ${args
       .filter((a) => !['no-docs', 'no-es', 'no-lib'].includes(a))
       .join(' ')} ${nodePath}node ${require.resolve(`${corePackageName}/lib/build.mjs`)}`;
@@ -48,10 +46,10 @@ program
       for (let i = 0, len = buildLib.length; i < len; i++) {
         const dir = join(cwd, `./${buildLib[i].dir}`);
 
-        spawn(`rm -rf ${dir}`, spawnOptions);
+        removeDir(dir);
         // 编译 package
         const convert = spawn(
-          `${nodePath}npx ${swc} components -d ${buildLib[i].dir} --strip-leading-paths --config-file ${swcrc} -C jsc.experimental.cacheRoot=${swcCachePath} -C module.type=${buildLib[i].type} --copy-files`,
+          `${nodePath}npx ${swc} components -d ${buildLib[i].dir} -q --strip-leading-paths --config-file ${swcrc} -C jsc.experimental.cacheRoot=${swcCachePath} -C module.type=${buildLib[i].type} -D --ignore "**/*.test.(js|ts)x?$"`,
           spawnOptions
         );
 
@@ -84,7 +82,7 @@ program
             ],
           })
         );
-        spawn(`rm -rf ./types`, spawnOptions);
+        removeDir('./types');
         // 编译类型文件
         spawn(`${nodePath}npx ${tsc} --project ${pkgPath} --outDir types`, spawnOptions);
       }
