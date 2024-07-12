@@ -36,11 +36,12 @@ program
       const swc = require.resolve('@swc/cli/bin/swc.js');
 
       const buildLib = [
-        hasLib && { type: 'commonjs', dir: 'lib' },
-        hasEs && { type: 'es6 -C jsc.target=es2015', dir: 'es' },
+        hasLib && { type: 'commonjs', dir: 'lib', msg: 'Convert to CommonJS' },
+        hasEs && { type: 'es6 -C jsc.target=es2015', dir: 'es', msg: 'Convert to ES Module' },
       ].filter(Boolean) as {
         type: string;
         dir: string;
+        msg: string;
       }[];
 
       for (let i = 0, len = buildLib.length; i < len; i++) {
@@ -83,15 +84,21 @@ program
           })
         );
         removeDir('./types');
+        const msg = chalk.cyan('Generate DTS');
+
+        console.time(msg);
         // 编译类型文件
-        spawn(`${nodePath}npx ${tsc} --project ${pkgPath} --outDir types`, spawnOptions);
+        const dts = spawn(
+          `${nodePath}npx ${tsc} --project ${pkgPath} --outDir types`,
+          spawnOptions
+        );
+
+        dts.on('close', () => {
+          console.timeEnd(msg);
+        });
       }
     }
     if (type !== 'library' || (hasDocs && type === 'library')) {
-      const build = spawn(shellSrc, spawnOptions);
-
-      build.on('close', async function () {
-        process.exit(0);
-      });
+      spawn(shellSrc, spawnOptions);
     }
   });
