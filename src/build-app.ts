@@ -5,7 +5,7 @@ import readline from 'readline';
 import { program } from 'commander';
 import { input, checkbox } from '@inquirer/prompts';
 import shell from 'shelljs';
-import { bundleApk, bundleIpa } from './utils/bundle-app.js';
+import { bundleApk, bundleIOS } from './utils/bundle-app.js';
 import {
   jsonToPlist,
   jsonToXml,
@@ -192,7 +192,7 @@ const createApp = async () => {
         bundleApk(outputPath, outputBundleDir, bundleItem[1]);
       }
       if (bundleItem[0] === 'ios') {
-        bundleIpa(outputPath, outputBundleDir, bundleItem[1]);
+        bundleIOS(outputPath, outputBundleDir, bundleItem[1]);
       }
     });
     shell.exec(`rm -rf ${outputPath}`, { silent: true });
