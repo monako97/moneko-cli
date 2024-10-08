@@ -186,54 +186,42 @@ const genFiles = (options: {
 
     Object.keys(ignoreConfig).forEach((ignore) => {
       const ignoreSrc = `${destination}/${ignore}`;
-      let ignoreVal = ignoreConfig[ignore];
+      let ignoreVal: string[] = ignoreConfig[ignore];
 
-      if (ignore.includes('eslintrc')) {
-        let frameworkLint: string[] = [];
-
+      if (ignore.includes('eslint.config.mjs')) {
         if (framework === 'solid') {
-          frameworkLint = ['  - plugin:solid/recommended', 'plugins:', '  - solid'];
+          ignoreVal.unshift("import solid from 'eslint-plugin-solid/configs/typescript';");
+          ignoreVal = ignoreVal.map((v, i) =>
+            i === ignoreVal.length - 1 ? 'export default conf.concat(solid);' : v
+          );
         } else if (framework === 'react') {
-          frameworkLint = [
-            '  - plugin:react/recommended',
-            '  - plugin:react-hooks/recommended',
-            'plugins:',
-            '  - react',
-            '  - react-hooks',
-          ];
+          ignoreVal.unshift(
+            "import reactHooks from 'eslint-plugin-react-hooks';",
+            "import react from 'eslint-plugin-react/configs/recommended.js';"
+          );
+          ignoreVal = ignoreVal.map((v, i) =>
+            i === ignoreVal.length - 1
+              ? "export default conf.concat({ settings: { react: { version: 'detect' } }, plugins: { 'react-hooks': reactHooks } },).concat(react);"
+              : v
+          );
         }
-        ignoreVal = [
-          ...ignoreVal,
-          ...frameworkLint,
-          'rules:',
-          '  import/no-unresolved:',
-          '    - 2',
-          '    - ignore:',
-          '      - \\?raw$',
-          '      - ^@/',
-          '      - ^@app',
-          '      - ^@moneko/common',
-          '      - ^@moneko/css',
-          isLibrary && '      - ^@pkg',
-          isLibrary && '      - ^libraryNameTemplate',
-        ].filter(Boolean);
       }
-      ignoreVal = ignoreVal.join('\n').replace(/libraryNameTemplate/g, name);
+      const ignoreStr = ignoreVal.join('\n').replace(/libraryNameTemplate/g, name);
 
       if (ignore.includes('prettier') || ignore.includes('eslint')) {
         if (hasEslint) {
-          saveFile(ignoreSrc, ignoreVal);
+          saveFile(ignoreSrc, ignoreStr);
         }
       } else if (ignore.includes('stylelint')) {
         if (hasStylelint) {
-          saveFile(ignoreSrc, ignoreVal);
+          saveFile(ignoreSrc, ignoreStr);
         }
       } else if (ignore.includes('commitlintrc')) {
         if (hasHusky) {
-          saveFile(ignoreSrc, ignoreVal);
+          saveFile(ignoreSrc, ignoreStr);
         }
       } else {
-        saveFile(ignoreSrc, ignoreVal);
+        saveFile(ignoreSrc, ignoreStr);
       }
     });
 

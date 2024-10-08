@@ -15,12 +15,10 @@ program
   .description('js代码规范检查')
   .action((soucre, _, cmd) => {
     const eslint = join(require.resolve('eslint'), '../../bin/eslint.js');
-    const shellSrc = `${nodePath}npx ${eslint} ${relative(
+    const shellSrc = `${nodePath}npx ${eslint} ${relative(cwd, soucre)} --config ${relative(
       cwd,
-      soucre
-    )} --ext js,ts,jsx,tsx,md,mdx,vue ${cmd.parent.args
-      .slice(2)
-      .join(' ')} --cache --cache-location "${cachePath}/.eslintcache"`;
+      'eslint.config.mjs'
+    )} ${cmd.parent.args.slice(2).join(' ')} --cache --cache-location "${cachePath}/.eslintcache"`;
 
     runLint(shellSrc, 'eslint');
   });

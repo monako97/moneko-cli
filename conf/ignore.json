@@ -32,10 +32,18 @@
     "yarn.lock",
     "*.less.d.ts"
   ],
-  ".eslintrc.yaml": ["extends:", "  - neko"],
+  "eslint.config.mjs": [
+    "import neko from 'eslint-config-neko';",
+    "",
+    "const conf = [",
+    "  ...neko.configs.recommended,",
+    "  { ignores: ['**/**/*.mdx?', 'lib', 'docs', 'coverage', 'prism.js'] }",
+    "];",
+    "",
+    "export default conf;"
+  ],
   ".prettierrc.yaml": ["printWidth: 100", "singleQuote: true", "bracketSameLine: false"],
-  ".prettierignore": ["LICENSE", ".gitignore", ".DS_Store", ".editorconfig", ".eslintignore"],
-  ".eslintignore": ["lib", "docs", "coverage", "**/**/examples/*.md"],
+  ".prettierignore": ["LICENSE", ".gitignore", ".DS_Store", ".editorconfig"],
   ".stylelintrc.yaml": ["extends:", "  - stylelint-config-moneko"],
   ".commitlintrc.yaml": [
     "extends:",
