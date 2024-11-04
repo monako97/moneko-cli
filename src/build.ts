@@ -44,6 +44,25 @@ program
         msg: string;
       }[];
 
+      const pkgPath = join(__dirname, '.types.json');
+
+      if (buildLib.length) {
+        updateFileSync(
+          pkgPath,
+          JSON.stringify({
+            extends: relative(__dirname, join(cwd, 'tsconfig.json')),
+            include: [
+              relative(__dirname, join(cwd, 'components')),
+              relative(__dirname, join(cwd, 'typings')),
+            ],
+            exclude: [
+              relative(__dirname, join(cwd, 'components/**/examples/*')),
+              relative(__dirname, join(cwd, 'components/**/__tests__/*')),
+              relative(__dirname, join(cwd, 'components/**/__mocks__/*')),
+            ],
+          })
+        );
+      }
       for (let i = 0, len = buildLib.length; i < len; i++) {
         const dir = join(cwd, `./${buildLib[i].dir}`);
 
@@ -64,29 +83,9 @@ program
             }
           }
         });
-      }
-      if (buildLib.length) {
-        const pkgPath = join(__dirname, '.types.json');
-
-        updateFileSync(
-          pkgPath,
-          JSON.stringify({
-            extends: relative(__dirname, join(cwd, 'tsconfig.json')),
-            include: [
-              relative(__dirname, join(cwd, 'components')),
-              relative(__dirname, join(cwd, 'typings')),
-            ],
-            exclude: [
-              relative(__dirname, join(cwd, 'components/**/examples/*')),
-              relative(__dirname, join(cwd, 'components/**/__tests__/*')),
-              relative(__dirname, join(cwd, 'components/**/__mocks__/*')),
-            ],
-          })
-        );
-        removeDir('./types');
         // 编译类型文件
         spawn(
-          `${nodePath}npx ${tsc} --project ${pkgPath} --outDir types`,
+          `${nodePath}npx ${tsc} --project ${pkgPath} --outDir ${buildLib[i].dir}`,
           spawnOptions
         );
       }

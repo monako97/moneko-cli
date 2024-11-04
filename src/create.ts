@@ -196,14 +196,13 @@ const genFiles = (options: {
           );
         } else if (framework === 'react') {
           ignoreVal.unshift(
-            "import reactHooks from 'eslint-plugin-react-hooks';",
-            "import react from 'eslint-plugin-react/configs/recommended.js';"
+            "import react from 'eslint-plugin-react';",
+            "import hooks from 'eslint-plugin-react-hooks';"
           );
-          ignoreVal = ignoreVal.map((v, i) =>
-            i === ignoreVal.length - 1
-              ? "export default conf.concat({ settings: { react: { version: 'detect' } }, plugins: { 'react-hooks': reactHooks } },).concat(react);"
-              : v
-          );
+          const exportVal =
+            "export default conf.concat(react.configs.flat.recommended).concat({ settings: { react: { version: 'detect' } }, plugins: { 'react-hooks': hooks }, rules: hooks.configs.recommended.rules });";
+
+          ignoreVal = ignoreVal.map((v, i) => (i === ignoreVal.length - 1 ? exportVal : v));
         }
       }
       const ignoreStr = ignoreVal.join('\n').replace(/libraryNameTemplate/g, name);
