@@ -1,5 +1,5 @@
 import readline from 'readline';
-import shelljs from 'shelljs';
+import { exec } from 'child_process';
 import chalk from 'chalk';
 import { cliPkgJson, nodePath } from './config.js';
 
@@ -31,19 +31,15 @@ export const getLastVersion = (pkg: string, callback?: ((val: string) => string)
     );
   }
 
-  shelljs.exec(
+  exec(
     `${nodePath}npm view ${pkg} version`,
-    {
-      silent: true,
-      async: true
-    },
-    (code, stdout, stderr) => {
+    { encoding: 'utf-8' },
+    (err, stdout, stderr) => {
       let version = stdout,
         oth = '';
 
       doneFetch.push(fetchList.splice(pkg as unknown as number, 1));
-
-      if (stderr) {
+      if (err || stderr) {
         return isFunc(callback) && (callback as Function)('last');
       }
       if (cliPkgJson.name === pkg && stdout.replace(/\n/, '') !== cliPkgJson.version) {

@@ -1,41 +1,26 @@
-import shell from 'shelljs';
+import { execSync } from 'child_process'
 import { progress } from './progress.js';
 import { downloadFile } from './download.js';
 import { nodePath } from './config.js';
-
 export const fetchTemplate = (pkgName: string, onFinish?: () => void) => {
-  const registryURL = shell
-    .exec(`${nodePath}npm config get registry`, {
-      silent: true,
-    })
-    .stdout.replace(/\n/g, '');
+  const registryURL = execSync(`${nodePath}npm config get registry`, {
+    encoding: 'utf-8',
+  }).trim()
+  const version = execSync(`${nodePath}npm view ${pkgName} version --registry ${registryURL}`, {
+    encoding: 'utf-8',
+  }).trim()
 
-  shell.exec(
-    `${nodePath}npm view ${pkgName} version`,
-    {
-      silent: true,
-      async: true,
-    },
-    function (_code, stdout, stderr) {
-      if (stderr) {
-        throw stderr;
+  downloadFile(`${registryURL}${pkgName}/-/${pkgName}-${version}.tgz`, null, (state, pro = '0', currPro, total) => {
+    if (state == 'data') {
+      progress(
+        parseFloat(pro),
+        pro === '100.00' ? '✨生成完成: ' : '正在生成: ',
+        currPro + 'k/' + total + 'k'
+      );
+    } else if (state === 'finish:data') {
+      if (onFinish) {
+        onFinish();
       }
-      const version = stdout.replace(/\n/g, '');
-      const url = `${registryURL}${pkgName}/-/${pkgName}-${version}.tgz`;
-
-      downloadFile(url, null, (state, pro = '0', currPro, total) => {
-        if (state == 'data') {
-          progress(
-            parseFloat(pro),
-            pro === '100.00' ? '✨生成完成: ' : '正在生成: ',
-            currPro + 'k/' + total + 'k'
-          );
-        } else if (state === 'finish:data') {
-          if (onFinish) {
-            onFinish();
-          }
-        }
-      });
     }
-  );
+  });
 };

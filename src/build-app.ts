@@ -1,10 +1,10 @@
 import chalk from 'chalk';
+import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
 import { program } from 'commander';
 import { input, checkbox } from '@inquirer/prompts';
-import shell from 'shelljs';
 import { bundleApk, bundleIOS } from './utils/bundle-app.js';
 import {
   jsonToPlist,
@@ -16,7 +16,7 @@ import {
 } from './utils/txml.js';
 import { __dirname, copyFolderRecursiveSync } from './file.js';
 import { cwd } from './utils/config.js';
-import { loadFileSync, saveFile } from '@moneko/utils';
+import { createDir, loadFileSync, removeDir, saveFile } from '@moneko/utils';
 
 const createApp = async () => {
   const bundleId = await input({
@@ -59,14 +59,10 @@ const createApp = async () => {
   const sh = `flutter create -t app --org ${bundleId} -i swift -a kotlin ${bundle_id}`;
 
   const outputPath = path.join(cwd, '/' + bundle_id);
-
-  shell.exec(sh, { silent: true });
-  shell.cd(outputPath);
-
   const webAssetsOutput = path.join(outputPath, 'assets/web/');
 
-  shell.exec('mkdir -p ' + webAssetsOutput, { silent: true });
-
+  execSync(sh, { encoding: 'utf-8' });
+  createDir(webAssetsOutput)
   process.stdout.write(chalk.yellow('正在注册资产...'));
   // 拷贝 dist
   copyFolderRecursiveSync(webAssetsEntry, webAssetsOutput);
@@ -182,7 +178,7 @@ const createApp = async () => {
 
   const outputBundleDir = path.join(cwd, './bundle/');
 
-  shell.exec('mkdir -p ' + outputBundleDir, { silent: true });
+  createDir(outputBundleDir)
   // 文件准备ok
   setTimeout(() => {
     bundles.forEach((item: string) => {
@@ -195,12 +191,9 @@ const createApp = async () => {
         bundleIOS(outputPath, outputBundleDir, bundleItem[1]);
       }
     });
-    shell.exec(`rm -rf ${outputPath}`, { silent: true });
-
+    removeDir(outputPath)
     if (fs.existsSync(path.join(outputBundleDir, 'Runner'))) {
-      shell.exec(`rm -rf ${path.join(outputBundleDir, 'Runner')}`, {
-        silent: true,
-      });
+      removeDir(path.join(outputBundleDir, 'Runner'));
     }
 
     readline.cursorTo(process.stdout, 0);
