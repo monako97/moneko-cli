@@ -2,7 +2,7 @@ import { spawn } from 'child_process';
 import chalk from 'chalk';
 import { program } from 'commander';
 import { corePackageName, nodePath } from './utils/config.js';
-import setupEnv from './utils/setup-env.js';
+// import setupEnv from './utils/setup-env.js';
 import require from './utils/require.js';
 
 program
@@ -13,7 +13,7 @@ program
       process.stdout.write(chalk.red('type: 无效值 ' + chalk.gray(type)));
       process.exit(1);
     }
-    setupEnv('development', type, framework);
+    // setupEnv('development', type, framework);
     const args: string[] = cmd[1].args.slice(2),
       hasNoVerify = args.indexOf('no-verify');
     if (hasNoVerify !== -1) {
