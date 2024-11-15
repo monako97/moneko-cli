@@ -32,6 +32,14 @@ async function setupEnv(mode: string, type: string, framework: string) {
       Object.assign(obj, parsed);
     }
   });
+
+  Object.keys(obj).forEach((key) => {
+    const next = obj[key as keyof typeof obj];
+
+    if (process.env[key] !== next) {
+      process.env[key] = obj[key as keyof typeof obj];
+    }
+  });
   return obj;
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@moneko/cli",
-  "version": "2.16.0-beta.1",
+  "version": "2.16.0-beta.2",
   "description": "cli",
   "engines": {
     "node": ">= 16.14.0"
