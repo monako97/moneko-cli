@@ -2,7 +2,7 @@ import { type SpawnOptions, spawn } from 'child_process';
 import { join, relative } from 'path';
 import chalk from 'chalk';
 import { program } from 'commander';
-// import setupEnv from './utils/setup-env.js';
+import setupEnv from './utils/setup-env.js';
 import { lesscCommonjs } from './lessc.js';
 import { nodePath, corePackageName, cwd, swcCachePath } from './utils/config.js';
 import { rmDirAsyncParalle } from './utils/rmdoc.js';
@@ -16,12 +16,12 @@ const spawnOptions: SpawnOptions = { stdio: 'inherit', shell: true };
 program
   .command('build <type> <framework>')
   .description('编译项目')
-  .action((type, framework, ...cmd) => {
+  .action(async (type, framework, ...cmd) => {
     if (!type) {
       process.stdout.write(chalk.red(`type: 无效值 ${chalk.gray(type)}`));
       process.exit(1);
     }
-    // setupEnv('production', type, framework);
+    await setupEnv('production', type, framework);
     const args: string[] = cmd[1].args.slice(2);
     const hasDocs = !args.includes('no-docs'),
       hasLib = !args.includes('no-lib'),

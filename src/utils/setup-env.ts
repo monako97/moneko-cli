@@ -1,26 +1,38 @@
-// import { join, relative } from 'path';
-// import { cwd } from './config.js';
-// import { config } from 'dotenv';
-// import { __dirname } from '../file.js';
-// import { updateFileSync } from '@moneko/utils';
+import { loadFile } from '@moneko/utils';
 
-// // function setupEnv(mode: string, type: string, framework: string) {
-// //   const envPath = join(__dirname, `.${mode}.env`);
+async function setupEnv(mode: string, type: string, framework: string) {
+  const envPaths = ['.env','.env/.env', `.env/.${mode === 'production' ? 'prod' : 'dev'}.env`];
+  const obj = {
+    NODE_ENV: mode,
+    APPTYPE: type,
+    FRAMEWORK: framework,
+  };
+  const envs = await Promise.all(envPaths.map(loadFile));
 
-// //   updateFileSync(envPath, `NODE_ENV=${mode}\nAPPTYPE=${type}\nFRAMEWORK=${framework}`);
-// //   const envs = [
-// //     envPath,
-// //     relative(cwd, '.env'),
-// //     relative(cwd, '.env/.env'),
-// //     relative(cwd, `.env/.${mode === 'production' ? 'prod' : 'dev'}.env`),
-// //   ];
+  envs.forEach((env) => {
+    if (env) {
+      const parsed = env.split('\n').reduce<Record<string, unknown>>((acc, line) => {
+        // 跳过空行和注释
+        if (!line || line.trim().startsWith('#')) {
+          return acc;
+        }
+        // 分割键值对
+        const [key, ...values] = line.split('=');
 
-// //   envs.forEach((env) => {
-// //     config({
-// //       path: env,
-// //       override: true,
-// //     }).parsed;
-// //   });
-// // }
+        if (!key) return acc;
 
-// export default setupEnv;
+        // 合并可能包含 = 的值
+        const value = values.join('=').trim();
+
+        // 移除引号并添加到对象
+        acc[key.trim()] = value.replace(/^["']|["']$/g, '');
+        return acc;
+      }, {});
+
+      Object.assign(obj, parsed);
+    }
+  });
+  return obj;
+}
+
+export default setupEnv;
