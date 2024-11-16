@@ -17,9 +17,16 @@ export const downloadFile = (
     total?: string
   ) => void
 ) => {
-  const fetch = url.startsWith('https:') ? https : http;
+  const fetchFunction = url.startsWith('https:') ? https : http;
 
-  fetch.get(url, (res) => {
+  fetchFunction.get(url, (res) => {
+    // fix: 重定向
+    if (res.statusCode === 302 || res.statusCode === 301) {
+      const redirectUrl = res.headers.location;
+      if (redirectUrl) {
+        return downloadFile(redirectUrl, dest, cb);
+      }
+    }
     if (res.statusCode !== 200) return isFunc(cb) && cb(res.statusCode);
     // 进度
     const len = parseInt(res.headers['content-length'] || '0'); // 文件总长度

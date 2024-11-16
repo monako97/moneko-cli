@@ -133,9 +133,9 @@ const genFiles = (options: {
     pkgJson.author = options.author;
     pkgJson.scripts.start = `${cliAlias} start ${appTypeName} ${framework}`;
     pkgJson.scripts.build = `${cliAlias} build ${appTypeName} ${framework}`;
-    pkgJson.version = '1.0.0';
+    pkgJson.version = '0.0.1';
     pkgJson.main = 'index.js';
-    pkgJson.files = undefined;
+    pkgJson.files = void 0;
     const lints = [
       hasStylelint && 'npm run stylelint',
       hasEslint && 'npm run eslint',
