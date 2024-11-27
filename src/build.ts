@@ -1,6 +1,5 @@
 import { type SpawnOptions, spawn } from 'child_process';
 import { join, relative } from 'path';
-import chalk from 'chalk';
 import { program } from 'commander';
 import setupEnv from './utils/setup-env.js';
 import { lesscCommonjs } from './lessc.js';
@@ -9,7 +8,7 @@ import { rmDirAsyncParalle } from './utils/rmdoc.js';
 import setupSwcRc from './utils/setup-swcrc.js';
 import require from './utils/require.js';
 import { __dirname } from './file.js';
-import { deleteEmptyDirs, updateFileSync, removeDir } from '@moneko/utils';
+import { deleteEmptyDirs, updateFileSync, removeDir, ink, println } from '@moneko/utils';
 
 const spawnOptions: SpawnOptions = { stdio: 'inherit', shell: true };
 
@@ -18,7 +17,7 @@ program
   .description('编译项目')
   .action(async (type, framework, ...cmd) => {
     if (!type) {
-      process.stdout.write(chalk.red(`type: 无效值 ${chalk.gray(type)}`));
+      println(ink(`type: 无效值 ${ink(type, '245')}`, 'red'));
       process.exit(1);
     }
     await setupEnv('production', type, framework);

@@ -7,7 +7,6 @@ import './eslint.js';
 import './stylelint.js';
 import './build.js';
 import './start.js';
-import './create.js';
 import './build-app.js';
 import './git-hooks.js';
 import './changelog.js';

@@ -1,20 +1,17 @@
+import { ink, print } from '@moneko/utils';
 import { spawnSync, StdioOptions } from 'child_process';
-import readline from 'readline';
-import chalk from 'chalk';
 
 export const runLint = (shellSrc: string, pluginName: string, stdio: StdioOptions = 'inherit') => {
-  const pkg = chalk.cyan(pluginName);
+  const pkg = ink(pluginName, 'cyan');
 
-  process.stdout.write(pkg + ': ' + chalk.yellow('Runing...'));
+  print(pkg + ': ' + ink('Runing...', 'yellow'), true);
   const child = spawnSync(shellSrc, {
     stdio: stdio,
     shell: true
   });
 
-  readline.cursorTo(process.stdout, 0);
-  const color = child.status !== 0 ? chalk.red : chalk.green;
-  const output = color(`✨ ${child.status !== 0 ? 'Error' : 'Successfully'}! \n`);
+  const output = ink(`✨ ${child.status !== 0 ? 'Error' : 'Successfully'}! \n`, child.status !== 0 ? 'red' : 'green');
 
-  process.stdout.write(pkg + ': ' + output);
+  print(pkg + ': ' + output, true);
   process.exit(child.status || 0);
 };

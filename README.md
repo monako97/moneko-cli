@@ -23,7 +23,7 @@
 ### 创建项目
 
 ```sh
-mo create <app-name>
+npm create mo <app-name>
 ```
 
 ## 启动项目

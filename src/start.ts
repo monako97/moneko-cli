@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
-import chalk from 'chalk';
 import { program } from 'commander';
+import { ink, println } from '@moneko/utils';
 import { corePackageName, nodePath } from './utils/config.js';
 import setupEnv from './utils/setup-env.js';
 import require from './utils/require.js';
@@ -10,7 +10,7 @@ program
   .description('运行项目')
   .action(async (type, framework, ...cmd) => {
     if (!type) {
-      process.stdout.write(chalk.red('type: 无效值 ' + chalk.gray(type)));
+      println(ink('type: 无效值 ' + ink(type, '245'), 'red'));
       process.exit(1);
     }
     await setupEnv('development', type, framework);

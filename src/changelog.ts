@@ -66,7 +66,7 @@ function getTags(remoteUrl: string) {
     date?: string;
     logs: Record<string, string[]>;
   }[] = [];
-  const lines = output.trim().split('\n');
+  const lines: string[] = output.trim().split('\n');
 
   lines.forEach((line, i) => {
     const [commitId, tag, date] = line.split(' ');
@@ -154,7 +154,7 @@ program
           }
         }
       });
-    } catch (error) {
+    } catch {
       text.push('\n当前分支尚无任何提交\n');
     }
 
