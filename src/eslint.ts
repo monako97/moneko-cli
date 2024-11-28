@@ -1,7 +1,7 @@
 import { join, relative } from 'path';
 import { program } from 'commander';
 import { runLint } from './runlint.js';
-import { cachePath, cwd, nodePath } from './utils/config.js';
+import { cachePath, cwd, runtimePath } from './utils/config.js';
 import require from './utils/require.js';
 
 program
@@ -15,7 +15,7 @@ program
   .description('js代码规范检查')
   .action((soucre, _, cmd) => {
     const eslint = join(require.resolve('eslint'), '../../bin/eslint.js');
-    const shellSrc = `${nodePath}npx ${eslint} ${relative(cwd, soucre)} --config ${relative(
+    const shellSrc = `${runtimePath} ${eslint} ${relative(cwd, soucre)} --config ${relative(
       cwd,
       'eslint.config.mjs'
     )} ${cmd.parent.args.slice(2).join(' ')} --cache --cache-location "${cachePath}/.eslintcache"`;
