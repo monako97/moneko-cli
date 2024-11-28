@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import { program } from 'commander';
 import { ink, println } from '@moneko/utils';
-import { corePackageName, nodePath } from './utils/config.js';
+import { corePackageName, runtimePath } from './utils/config.js';
 import setupEnv from './utils/setup-env.js';
 import require from './utils/require.js';
 
@@ -21,7 +21,7 @@ program
     }
 
     spawn(
-      `${nodePath}npx ${args.join(' ')} ${nodePath}node ${require.resolve(
+      `${runtimePath} ${require.resolve(
         `${corePackageName}/lib/dev.mjs`
       )}`,
       {
