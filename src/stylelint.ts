@@ -1,6 +1,6 @@
 import { relative, join } from 'path';
 import { program } from 'commander';
-import { cachePath, cwd, nodePath } from './utils/config.js';
+import { cachePath, cwd, runtimePath } from './utils/config.js';
 import { runLint } from './runlint.js';
 import require from './utils/require.js';
 
@@ -16,7 +16,7 @@ program
   .action((soucre, _, cmd) => {
     const stylelint = join(require.resolve('stylelint'), '../../bin/stylelint.mjs');
     const exts = ['less', 'css', 'scss', 'sass', 'style.ts', 'style.js'];
-    const shellSrc = `${nodePath}npx ${stylelint} ${relative(
+    const shellSrc = `${runtimePath} ${stylelint} ${relative(
       cwd,
       soucre
     )}/**/**/**/**/*.{${exts.join(',')}} ${cmd.parent.args
