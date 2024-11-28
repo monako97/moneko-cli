@@ -68,7 +68,7 @@ program
         removeDir(dir);
         // 编译 package
         const convert = spawn(
-          `${npx} ${swc} components -d ${buildLib[i].dir} -q --strip-leading-paths --config-file ${swcrc} -C jsc.experimental.cacheRoot=${swcCachePath} -C module.type=${buildLib[i].type} -D --ignore "**/*.test.(js|ts)x?$"`,
+          `${runtimePath} ${swc} components -d ${buildLib[i].dir} -q --strip-leading-paths --config-file ${swcrc} -C jsc.experimental.cacheRoot=${swcCachePath} -C module.type=${buildLib[i].type} -D --ignore "**/*.test.(js|ts)x?$"`,
           spawnOptions
         );
 
@@ -84,7 +84,7 @@ program
         });
         // 编译类型文件
         spawn(
-          `${npx} ${tsc} --project ${pkgPath} --outDir ${buildLib[i].dir}`,
+          `${runtimePath} ${tsc} --project ${pkgPath} --outDir ${buildLib[i].dir}`,
           spawnOptions
         );
       }
