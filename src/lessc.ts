@@ -1,7 +1,7 @@
 import { extname, join, resolve } from 'path';
 import { readdirSync, statSync } from 'fs';
 import { exec } from 'child_process';
-import { nodePath, corePackageName, cwd } from './utils/config.js';
+import { runtimePath, corePackageName, cwd } from './utils/config.js';
 import require from './utils/require.js';
 import { loadFile, saveFile } from '@moneko/utils';
 
@@ -12,7 +12,7 @@ function lessc({ file, outputPath }: { file: string; outputPath: string }) {
   
   return new Promise((resolve, reject) => {
     exec(
-      `${nodePath}npx ${lesscBin} --js ${modifyVarBash} ${file} > ${outputPath}`,
+      `${runtimePath} ${lesscBin} --js ${modifyVarBash} ${file} > ${outputPath}`,
       function (error) {
         if (error) return reject(error);
         resolve(true);
