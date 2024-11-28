@@ -2,9 +2,19 @@ import { join, dirname } from 'path';
 import { __dirname } from '../file.js';
 import require from './require.js';
 
-const nodeDir = join(dirname(process.execPath).replace(/(\s+)/g, '\\$1'), '/');
+export function getRuntime() {
+  if (typeof Deno !== "undefined") {
+    return "deno";
+  }
+  if (typeof Bun !== "undefined") {
+    return "bun";
+  }
+  return "node";
+}
+const runtimeDir = dirname(process.execPath);
 
-export const nodePath = process.platform === 'win32' ? '' : nodeDir;
+export const runtimePath = join(runtimeDir, getRuntime());
+export const nodePath = runtimeDir;
 export const cliVersion = require(join(__dirname, '../package.json')).version;
 export const corePackageName = `@moneko/core`;
 export const cwd = process.cwd();
