@@ -20,6 +20,7 @@ if (process.platform === "win32") {
 }
 export const runtimePath = join(runtimeDir, getRuntime());
 export const nodePath = runtimeDir;
+export const npx = join(nodePath, "npx");
 export const cliVersion = require(join(__dirname, '../package.json')).version;
 export const corePackageName = `@moneko/core`;
 export const cwd = process.cwd();
