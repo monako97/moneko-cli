@@ -3,7 +3,7 @@ import { join, relative } from 'path';
 import { program } from 'commander';
 import setupEnv from './utils/setup-env.js';
 import { lesscCommonjs } from './lessc.js';
-import { nodePath, corePackageName, cwd, swcCachePath, runtimePath } from './utils/config.js';
+import { nodePath, npx, corePackageName, cwd, swcCachePath, runtimePath } from './utils/config.js';
 import { rmDirAsyncParalle } from './utils/rmdoc.js';
 import setupSwcRc from './utils/setup-swcrc.js';
 import require from './utils/require.js';
@@ -27,7 +27,7 @@ program
       hasEs = !args.includes('no-es');
     const _prefix = args.filter((a) => !['no-docs', 'no-es', 'no-lib'].includes(a)).join(' ');
       
-    const shellSrc = `${_prefix.trim().length ? nodePath+"npx "+_prefix:""} ${runtimePath} ${require.resolve(`${corePackageName}/lib/build.mjs`)}`;
+    const shellSrc = `${_prefix.trim().length ? npx+" "+_prefix:""} ${runtimePath} ${require.resolve(`${corePackageName}/lib/build.mjs`)}`;
 
     if (type === 'library') {
       const swcrc = setupSwcRc(framework);
@@ -68,7 +68,7 @@ program
         removeDir(dir);
         // 编译 package
         const convert = spawn(
-          `${nodePath}npx ${swc} components -d ${buildLib[i].dir} -q --strip-leading-paths --config-file ${swcrc} -C jsc.experimental.cacheRoot=${swcCachePath} -C module.type=${buildLib[i].type} -D --ignore "**/*.test.(js|ts)x?$"`,
+          `${npx} ${swc} components -d ${buildLib[i].dir} -q --strip-leading-paths --config-file ${swcrc} -C jsc.experimental.cacheRoot=${swcCachePath} -C module.type=${buildLib[i].type} -D --ignore "**/*.test.(js|ts)x?$"`,
           spawnOptions
         );
 
@@ -84,7 +84,7 @@ program
         });
         // 编译类型文件
         spawn(
-          `${nodePath}npx ${tsc} --project ${pkgPath} --outDir ${buildLib[i].dir}`,
+          `${npx} ${tsc} --project ${pkgPath} --outDir ${buildLib[i].dir}`,
           spawnOptions
         );
       }
