@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import { program } from 'commander';
 import { ink, println } from '@moneko/utils';
-import { corePackageName, npx, nodePath, runtimePath } from './utils/config.js';
+import { corePackageName, runtimePath } from './utils/config.js';
 import setupEnv from './utils/setup-env.js';
 import require from './utils/require.js';
 
@@ -20,13 +20,8 @@ program
       args.splice(hasNoVerify, 1);
     }
 
-    spawn(
-      `${args.length?npx+" "+args.join(" "):""}${runtimePath} ${require.resolve(
-        `${corePackageName}/lib/dev.mjs`
-      )}`,
-      {
-        stdio: 'inherit',
-        shell: true,
-      }
-    );
+    spawn(`${runtimePath} ${require.resolve(`${corePackageName}/lib/dev.mjs`)}`, {
+      stdio: 'inherit',
+      shell: true,
+    });
   });

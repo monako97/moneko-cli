@@ -2,25 +2,26 @@ import { join, dirname } from 'path';
 import { __dirname } from '../file.js';
 import require from './require.js';
 
-export function getRuntime() {
-  if (typeof Deno !== "undefined") {
-    return "deno";
+declare const Deno: Function;
+declare const Bun: Function;
+
+function getRuntime() {
+  if (typeof Deno !== 'undefined') {
+    return 'deno';
   }
-  if (typeof Bun !== "undefined") {
-    return "bun";
+  if (typeof Bun !== 'undefined') {
+    return 'bun';
   }
-  return "node";
+  return 'node';
 }
 let runtimeDir = dirname(process.execPath);
 
-if (process.platform === "win32") {
-  if (runtimeDir.includes(" ")) {
+if (process.platform === 'win32') {
+  if (runtimeDir.includes(' ')) {
     runtimeDir = `"${runtimeDir}"`;
   }
 }
 export const runtimePath = join(runtimeDir, getRuntime());
-export const nodePath = runtimeDir;
-export const npx = join(nodePath, "npx");
 export const cliVersion = require(join(__dirname, '../package.json')).version;
 export const corePackageName = `@moneko/core`;
 export const cwd = process.cwd();

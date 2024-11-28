@@ -56,6 +56,17 @@ function setupSwcRc(framework: 'react' | 'solid') {
                 lodash: {
                   transform: 'lodash/${member}',
                 },
+                '@ant-design/icons': {
+                  transform: 'es/icons/${member}',
+                },
+                antd: {
+                  transform: 'es/${member}',
+                  memberTransformers: ['dashed_case'],
+                },
+                'neko-ui': {
+                  transform: 'es/${member}',
+                  memberTransformers: ['dashed_case'],
+                },
               },
             ],
             isSolid && [

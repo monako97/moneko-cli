@@ -3,12 +3,11 @@ import { join, relative } from 'path';
 import { program } from 'commander';
 import setupEnv from './utils/setup-env.js';
 import { lesscCommonjs } from './lessc.js';
-import { nodePath, npx, corePackageName, cwd, swcCachePath, runtimePath } from './utils/config.js';
-import { rmDirAsyncParalle } from './utils/rmdoc.js';
+import { corePackageName, cwd, swcCachePath, runtimePath } from './utils/config.js';
 import setupSwcRc from './utils/setup-swcrc.js';
 import require from './utils/require.js';
 import { __dirname } from './file.js';
-import { deleteEmptyDirs, updateFileSync, removeDir, ink, println } from '@moneko/utils';
+import { deleteEmptyDirs, updateFileSync, removeDir, ink, println, scanFolderSync, removeFile } from '@moneko/utils';
 
 const spawnOptions: SpawnOptions = { stdio: 'inherit', shell: true };
 
@@ -25,9 +24,9 @@ program
     const hasDocs = !args.includes('no-docs'),
       hasLib = !args.includes('no-lib'),
       hasEs = !args.includes('no-es');
-    const _prefix = args.filter((a) => !['no-docs', 'no-es', 'no-lib'].includes(a)).join(' ');
-      
-    const shellSrc = `${_prefix.trim().length ? npx+" "+_prefix:""} ${runtimePath} ${require.resolve(`${corePackageName}/lib/build.mjs`)}`;
+    // const _prefix = args.filter((a) => !['no-docs', 'no-es', 'no-lib'].includes(a)).join(' ');
+
+    const shellSrc = `${runtimePath} ${require.resolve(`${corePackageName}/lib/build.mjs`)}`;
 
     if (type === 'library') {
       const swcrc = setupSwcRc(framework);
@@ -75,7 +74,7 @@ program
         convert.on('close', function (code) {
           if (code === 0) {
             // 去除 package 中的文档文件
-            rmDirAsyncParalle(dir, () => {});
+            scanFolderSync(dir, ['README.mdx', 'examples', '__*__']).forEach(removeFile);
             deleteEmptyDirs(dir);
             if (buildLib[i].type === 'commonjs') {
               lesscCommonjs();
