@@ -27,7 +27,7 @@ program
       hasEs = !args.includes('no-es');
     const _prefix = args.filter((a) => !['no-docs', 'no-es', 'no-lib'].includes(a)).join(' ');
       
-    const shellSrc = `${_prefix.trim().length ? nodePath+"npx ":""}${runtimePath} ${require.resolve(`${corePackageName}/lib/build.mjs`)}`;
+    const shellSrc = `${_prefix.trim().length ? nodePath+"npx "+_prefix:""} ${runtimePath} ${require.resolve(`${corePackageName}/lib/build.mjs`)}`;
 
     if (type === 'library') {
       const swcrc = setupSwcRc(framework);
