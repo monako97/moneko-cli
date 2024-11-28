@@ -11,8 +11,13 @@ export function getRuntime() {
   }
   return "node";
 }
-const runtimeDir = dirname(process.execPath);
+let runtimeDir = dirname(process.execPath);
 
+if (process.platform === "win32") {
+  if (runtimeDir.includes(" ")) {
+    runtimeDir = `"${runtimeDir}"`;
+  }
+}
 export const runtimePath = join(runtimeDir, getRuntime());
 export const nodePath = runtimeDir;
 export const cliVersion = require(join(__dirname, '../package.json')).version;
